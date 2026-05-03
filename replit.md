@@ -24,8 +24,6 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
 
-See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
-
 ## Artifacts
 
 ### Portfolio (`artifacts/portfolio`)
@@ -40,11 +38,6 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 - **Config**: `src/config/socials.ts` — fill in social links here; only entries with non-empty `href` are shown
 - **Context**: `src/context/CursorContext.tsx` — persists custom cursor toggle in localStorage
 
-### API Server (`artifacts/api-server`)
-- **Kind**: Express 5 + Drizzle ORM
-- **Port**: 8080
-- **Path**: `/api`
-
 ### Obsidian Ember Portfolio (`artifacts/obsidian-ember`)
 - **Kind**: React + Vite (static)
 - **Preview path**: `/obsidian-ember/`
@@ -52,17 +45,18 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 - **Fonts**: Space Grotesk (display/mono), DM Sans (body) — Google Fonts
 - **Animation**: Framer Motion, Lenis smooth scroll
 - **Sections**: Hero, About, Projects, Experience, Blog, Contact
-- **Components**: Preloader, CustomCursor (amber glow), Navbar (αD logo), Footer (SpotifyWidget)
+- **Components**: Preloader, CustomCursor (amber glow), Navbar (αD logo), Footer (BackgroundMusic + dormant SpotifyWidget)
 - **All public asset paths** must use `import.meta.env.BASE_URL` prefix — root-relative `/` paths 404 at this sub-path
+- **BackgroundMusic** (`src/components/BackgroundMusic.tsx`) — local ambient player UI, expects `public/ember-drift.mp3`, user-triggered only
 - **SpotifyWidget** (`src/components/SpotifyWidget.tsx`) — polls `/api/spotify/now-playing` every 30s; gracefully shows nothing when not connected
-- **Spotify integration**: connector `ccfg_spotify_01K49R1M6S088SR66BS9A0V4R7` — **not yet authorized**. User chose to keep widget dormant until they connect later. To activate: run `proposeIntegration("connector:ccfg_spotify_01K49R1M6S088SR66BS9A0V4R7")`, then call `addIntegration` with the resulting `connection:...` ID, then set `SPOTIFY_CONNECTION_ID` env var.
+- **Spotify integration**: connector `ccfg_spotify_01K49R1M6S088SR66BS9A0V4R7` — not authorized; user chose to keep widget dormant until later. Do not rely on it until manually connected.
 - **Project cards** (`src/components/sections/Projects.tsx`): 7-layer 3D hover (tilt, parallax image, specular highlight, foil iridescence, directional shadow, scanline, rim+corners) + magnetic pull within 220px via `useMagneticPull` hook. Respects `prefers-reduced-motion`.
 
 ### API Server (`artifacts/api-server`)
 - **Kind**: Express 5 + Drizzle ORM
 - **Port**: 8080
 - **Path**: `/api`
-- **Routes**: `GET /api/healthz`, `GET /api/spotify/now-playing`
+- **Routes**: `GET /api/healthz`
 
 ### Mockup Sandbox (`artifacts/mockup-sandbox`)
 - **Kind**: Vite component preview server

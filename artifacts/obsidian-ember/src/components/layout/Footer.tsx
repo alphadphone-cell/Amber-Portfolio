@@ -1,6 +1,6 @@
 import { activeSocials } from "../../config/socials";
 import { SocialIcon } from "../SocialIcon";
-import { SpotifyWidget } from "../SpotifyWidget";
+import { BackgroundMusic } from "../BackgroundMusic";
 
 export function Footer() {
   return (
@@ -10,13 +10,8 @@ export function Footer() {
         style={{ background: "linear-gradient(to right, transparent, rgba(245,158,11,0.3), transparent)" }}
       />
       <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-
         <div className="flex flex-col items-start gap-2">
-          <a
-            href="#hero"
-            className="flex items-center gap-1 group"
-            aria-label="AlphaD — back to top"
-          >
+          <a href="#hero" className="flex items-center gap-1 group" aria-label="AlphaD — back to top">
             <span
               className="text-2xl font-black"
               style={{
@@ -47,16 +42,15 @@ export function Footer() {
         </div>
 
         <nav className="flex flex-wrap justify-center gap-6" aria-label="Footer navigation">
-          <a href="#about"      className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">01. About</a>
-          <a href="#projects"   className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">02. Projects</a>
+          <a href="#about" className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">01. About</a>
+          <a href="#projects" className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">02. Projects</a>
           <a href="#experience" className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">03. Experience</a>
-          <a href="#blog"       className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">04. Blog</a>
-          <a href="#contact"    className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">05. Contact</a>
+          <a href="#blog" className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">04. Blog</a>
+          <a href="#contact" className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">05. Contact</a>
         </nav>
 
-        <div className="flex flex-col items-end gap-4">
-          {/* Spotify now-playing widget */}
-          <SpotifyWidget />
+        <div className="flex flex-col items-end gap-4 w-full">
+          <BackgroundMusic />
 
           {activeSocials.length > 0 && (
             <ul className="flex gap-4 m-0 p-0 list-none">
@@ -77,7 +71,6 @@ export function Footer() {
           )}
           <p className="font-mono text-xs text-muted-foreground">Designed & Built by <span style={{ color: "#f59e0b" }}>Anh Duy</span></p>
         </div>
-
       </div>
     </footer>
   );
