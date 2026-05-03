@@ -6,3 +6,27 @@ id = "DR6oPIwD8mcphfS2G-u6z"
 uri = "file://artifacts/portfolio/public/avatar-illustrated.png"
 type = "image"
 title = "void purple developer avatar"
+
+[[generated]]
+id = "cfRsrz-jBLd9B8RNTqgGR"
+uri = "file://artifacts/portfolio/public/project-nexus.png"
+type = "image"
+title = "nexus distributed task queue dashboard"
+
+[[generated]]
+id = "ouul3vfJoatQP6f5AKN-t"
+uri = "file://artifacts/portfolio/public/project-vaultify.png"
+type = "image"
+title = "vaultify secrets manager encryption UI"
+
+[[generated]]
+id = "XghRMcLm47PVFblC-vqq-"
+uri = "file://artifacts/portfolio/public/project-flowgraph.png"
+type = "image"
+title = "flowgraph visual workflow builder nodes"
+
+[[generated]]
+id = "YwTaEQJ4hP1yzeJneZ4SG"
+uri = "file://artifacts/portfolio/public/project-spectra.png"
+type = "image"
+title = "spectra kubernetes observability platform"
