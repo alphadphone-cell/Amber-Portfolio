@@ -45,6 +45,25 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 - **Port**: 8080
 - **Path**: `/api`
 
+### Obsidian Ember Portfolio (`artifacts/obsidian-ember`)
+- **Kind**: React + Vite (static)
+- **Preview path**: `/obsidian-ember/`
+- **Theme**: Ember dark theme — amber `#f59e0b`, red `#dc2626`, bg `#060402`
+- **Fonts**: Space Grotesk (display/mono), DM Sans (body) — Google Fonts
+- **Animation**: Framer Motion, Lenis smooth scroll
+- **Sections**: Hero, About, Projects, Experience, Blog, Contact
+- **Components**: Preloader, CustomCursor (amber glow), Navbar (αD logo), Footer (SpotifyWidget)
+- **All public asset paths** must use `import.meta.env.BASE_URL` prefix — root-relative `/` paths 404 at this sub-path
+- **SpotifyWidget** (`src/components/SpotifyWidget.tsx`) — polls `/api/spotify/now-playing` every 30s; gracefully shows nothing when not connected
+- **Spotify integration**: connector `ccfg_spotify_01K49R1M6S088SR66BS9A0V4R7` — **not yet authorized**. User chose to keep widget dormant until they connect later. To activate: run `proposeIntegration("connector:ccfg_spotify_01K49R1M6S088SR66BS9A0V4R7")`, then call `addIntegration` with the resulting `connection:...` ID, then set `SPOTIFY_CONNECTION_ID` env var.
+- **Project cards** (`src/components/sections/Projects.tsx`): 7-layer 3D hover (tilt, parallax image, specular highlight, foil iridescence, directional shadow, scanline, rim+corners) + magnetic pull within 220px via `useMagneticPull` hook. Respects `prefers-reduced-motion`.
+
+### API Server (`artifacts/api-server`)
+- **Kind**: Express 5 + Drizzle ORM
+- **Port**: 8080
+- **Path**: `/api`
+- **Routes**: `GET /api/healthz`, `GET /api/spotify/now-playing`
+
 ### Mockup Sandbox (`artifacts/mockup-sandbox`)
 - **Kind**: Vite component preview server
 - **Port**: 8081
