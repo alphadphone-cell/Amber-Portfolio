@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Music2, Pause, Play, SkipForward } from "lucide-react";
+import { Music2, Pause, Play, SkipForward, Minus, Plus } from "lucide-react";
 
 const TRACKS = [
   {
@@ -10,14 +10,15 @@ const TRACKS = [
   },
 ];
 
-function VolumeEqualizer({ active }: { active: boolean }) {
+function VolumeEqualizer({ active, volume }: { active: boolean; volume: number }) {
   const bars = [
-    { h: "40%", d: 0.0 },
+    { h: "40%", d: 0 },
     { h: "85%", d: 0.12 },
     { h: "55%", d: 0.24 },
     { h: "95%", d: 0.1 },
     { h: "65%", d: 0.18 },
   ];
+  const level = Math.max(0.2, volume);
 
   return (
     <div className="flex items-end gap-1 h-5 w-12" aria-hidden="true">
@@ -26,7 +27,7 @@ function VolumeEqualizer({ active }: { active: boolean }) {
           key={i}
           className="w-1 rounded-full origin-bottom"
           style={{ background: "linear-gradient(180deg, #fef3c7 0%, #f59e0b 55%, #dc2626 100%)" }}
-          animate={active ? { height: [bar.h, "100%", "30%", "85%", bar.h] } : { height: "25%" }}
+          animate={active ? { height: [bar.h, `${Math.min(100, 55 + level * 50)}%`, "30%", "85%", bar.h] } : { height: `${20 + level * 30}%` }}
           transition={{
             duration: 0.9,
             repeat: active ? Infinity : 0,
@@ -45,12 +46,18 @@ export function BackgroundMusic() {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [armed, setArmed] = useState(false);
+  const [volume, setVolume] = useState(0.7);
   const track = TRACKS[0];
 
   const percent = useMemo(() => {
     if (!duration) return 0;
     return Math.min(100, Math.max(0, (progress / duration) * 100));
   }, [duration, progress]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) audio.volume = volume;
+  }, [volume]);
 
   useEffect(() => {
     const start = () => setArmed(true);
@@ -66,6 +73,7 @@ export function BackgroundMusic() {
     const audio = audioRef.current;
     if (!audio) return;
     audio.muted = false;
+    audio.volume = volume;
     try {
       await audio.play();
       setIsPlaying(true);
@@ -84,6 +92,7 @@ export function BackgroundMusic() {
     if (!audio) return;
 
     audio.muted = false;
+    audio.volume = volume;
     if (audio.paused) {
       await playAudio();
     } else {
@@ -96,8 +105,19 @@ export function BackgroundMusic() {
     const audio = audioRef.current;
     if (!audio) return;
     audio.muted = false;
+    audio.volume = volume;
     audio.currentTime = 0;
     await playAudio();
+  };
+
+  const changeVolume = async (delta: number) => {
+    const audio = audioRef.current;
+    const next = Math.min(1, Math.max(0, Number((volume + delta).toFixed(2))));
+    setVolume(next);
+    if (audio) audio.volume = next;
+    if (next > 0 && armed && audio?.paused) {
+      await playAudio();
+    }
   };
 
   return (
@@ -113,10 +133,7 @@ export function BackgroundMusic() {
       }}
     >
       <div className="flex items-center gap-3">
-        <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center"
-          style={{ background: "rgba(245,158,11,0.12)", color: "#f59e0b" }}
-        >
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "rgba(245,158,11,0.12)", color: "#f59e0b" }}>
           <Music2 className="w-5 h-5" />
         </div>
 
@@ -132,7 +149,7 @@ export function BackgroundMusic() {
           </p>
         </div>
 
-        <VolumeEqualizer active={isPlaying} />
+        <VolumeEqualizer active={isPlaying} volume={volume} />
 
         <button
           type="button"
@@ -155,11 +172,33 @@ export function BackgroundMusic() {
         </button>
       </div>
 
-      <div className="mt-4 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(245,158,11,0.08)" }}>
-        <div
-          className="h-full rounded-full"
-          style={{ width: `${percent}%`, background: "linear-gradient(90deg, #dc2626, #f59e0b)" }}
-        />
+      <div className="mt-4 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => void changeVolume(-0.1)}
+          className="w-9 h-9 rounded-full flex items-center justify-center transition-transform active:scale-95"
+          style={{ background: "rgba(245,158,11,0.08)", color: "#f59e0b" }}
+          aria-label="Decrease volume"
+        >
+          <Minus className="w-4 h-4" />
+        </button>
+
+        <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(245,158,11,0.08)" }}>
+          <div
+            className="h-full rounded-full"
+            style={{ width: `${percent}%`, background: "linear-gradient(90deg, #dc2626, #f59e0b)" }}
+          />
+        </div>
+
+        <button
+          type="button"
+          onClick={() => void changeVolume(0.1)}
+          className="w-9 h-9 rounded-full flex items-center justify-center transition-transform active:scale-95"
+          style={{ background: "rgba(245,158,11,0.08)", color: "#f59e0b" }}
+          aria-label="Increase volume"
+        >
+          <Plus className="w-4 h-4" />
+        </button>
       </div>
 
       <audio
@@ -168,6 +207,7 @@ export function BackgroundMusic() {
         preload="metadata"
         loop
         muted={!armed}
+        volume={volume}
         onTimeUpdate={(e) => {
           const audio = e.currentTarget;
           setProgress(audio.currentTime);
@@ -175,6 +215,7 @@ export function BackgroundMusic() {
         }}
         onLoadedMetadata={(e) => {
           const audio = e.currentTarget;
+          audio.volume = volume;
           setDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
         }}
         onEnded={() => {
