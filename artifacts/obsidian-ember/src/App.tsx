@@ -1,41 +1,72 @@
-import React from "react";
+import { Switch, Route, Router as WouterRouter } from "wouter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Navbar } from "@/components/Navbar";
-import { Hero } from "@/components/sections/Hero";
-import { About } from "@/components/sections/About";
-import { Experience } from "@/components/sections/Experience";
-import { Skills } from "@/components/sections/Skills";
-import { Projects } from "@/components/sections/Projects";
-import { Contact } from "@/components/sections/Contact";
-import { Footer } from "@/components/sections/Footer";
+import NotFound from "@/pages/not-found";
+import Home from "@/pages/home";
+import BlogPostPage from "@/pages/blog-post";
+import { Preloader } from "@/components/Preloader";
+import { CustomCursor } from "@/components/CustomCursor";
+import { CursorToggle } from "@/components/CursorToggle";
+import { CursorProvider } from "@/context/CursorContext";
+import { useState, useEffect } from "react";
+import Lenis from "lenis";
+
+const queryClient = new QueryClient();
+
+function Router() {
+  return (
+    <Switch>
+      <Route path="/" component={Home} />
+      <Route path="/blog/:slug" component={BlogPostPage} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
 
 function App() {
+  const [preloaderDone, setPreloaderDone] = useState(false);
+
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.3,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
+
+    let rafId: number;
+    function raf(time: number) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+    rafId = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
+  }, []);
+
   return (
-    <TooltipProvider>
-      <div className="relative min-h-screen w-full overflow-x-hidden selection:bg-primary/30 selection:text-primary">
-        {/* Global Noise Overlay */}
-        <div className="noise-bg"></div>
-
-        {/* Ambient Orbs */}
-        <div className="fixed bottom-0 left-0 w-[60vw] h-[60vh] bg-primary rounded-full blur-[150px] opacity-10 pointer-events-none transform -translate-x-1/2 translate-y-1/2"></div>
-        <div className="fixed top-0 right-0 w-[40vw] h-[40vh] bg-secondary rounded-full blur-[120px] opacity-10 pointer-events-none transform translate-x-1/3 -translate-y-1/3"></div>
-
-        <Navbar />
-        
-        <main className="relative z-10 flex flex-col pt-24">
-          <Hero />
-          <About />
-          <Skills />
-          <Experience />
-          <Projects />
-          <Contact />
-        </main>
-
-        <Footer />
-      </div>
-      <Toaster />
-    </TooltipProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <CursorProvider>
+          <a href="#main-content" className="skip-link">Skip to content</a>
+          <CustomCursor />
+          <CursorToggle />
+          <Preloader onComplete={() => setPreloaderDone(true)} />
+          <div
+            className="transition-opacity duration-500"
+            style={{ opacity: preloaderDone ? 1 : 0 }}
+          >
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Router />
+            </WouterRouter>
+          </div>
+          <Toaster />
+        </CursorProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 }
 
