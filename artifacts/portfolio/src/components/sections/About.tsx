@@ -27,9 +27,13 @@ export function About() {
           className="mb-16"
         >
           <h2 id="about-heading" className="text-3xl md:text-4xl font-bold flex items-center gap-4">
-            <span className="text-primary font-mono text-xl font-normal" aria-hidden="true">01.</span>
+            <span className="gradient-text font-mono text-xl font-normal" aria-hidden="true">01.</span>
             About Me
-            <div className="h-[1px] bg-border flex-1 max-w-xs ml-4" aria-hidden="true" />
+            <div
+              className="h-[1px] flex-1 max-w-xs ml-4"
+              style={{ background: "linear-gradient(to right, rgba(139,92,246,0.5), transparent)" }}
+              aria-hidden="true"
+            />
           </h2>
         </motion.div>
 
@@ -37,17 +41,19 @@ export function About() {
 
           {/* ── Text column ────────────────────────────────────── */}
           <div className="lg:col-span-7 space-y-6 text-lg text-muted-foreground leading-relaxed">
+
+            {/* Stats — glass panel */}
             <motion.dl
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 pb-8 border-b border-border/50"
+              className="glass-panel rounded-2xl p-6 grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
             >
               {stats.map(({ value, label }) => (
-                <div key={label}>
-                  <dt className="text-sm font-mono mt-1 text-muted-foreground">{label}</dt>
-                  <dd className="text-2xl font-bold text-foreground">{value}</dd>
+                <div key={label} className="text-center md:text-left">
+                  <dd className="text-3xl font-black gradient-text-vivid tabular-nums">{value}</dd>
+                  <dt className="text-xs font-mono mt-1 text-muted-foreground tracking-wider uppercase">{label}</dt>
                 </div>
               ))}
             </motion.dl>
@@ -90,7 +96,8 @@ export function About() {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.3, delay: 0.5 + index * 0.05 }}
-                    className="border border-primary/30 bg-primary/5 text-foreground hover:bg-primary/15 hover:border-primary hover:text-primary transition-colors text-sm font-mono px-3 py-1 rounded-sm cursor-default"
+                    className="relative glass text-foreground hover:text-primary transition-colors duration-200 text-sm font-mono px-3 py-1 rounded-sm cursor-default gradient-border"
+                    style={{ touchAction: "manipulation" }}
                   >
                     {skill}
                   </motion.li>
@@ -111,8 +118,9 @@ export function About() {
             <div className="flex justify-end mb-3">
               <button
                 onClick={() => setShowReal((p) => !p)}
-                className="font-mono text-xs text-muted-foreground hover:text-primary transition-colors border border-border hover:border-primary/50 px-3 py-1.5 rounded-sm flex items-center gap-2"
+                className="glass font-mono text-xs text-muted-foreground hover:text-primary transition-colors duration-200 border border-primary/20 hover:border-primary/50 px-3 py-1.5 rounded-sm flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 aria-label={showReal ? "Show illustrated avatar" : "Show real photo"}
+                style={{ touchAction: "manipulation" }}
               >
                 <span
                   className="inline-block w-1.5 h-1.5 rounded-full bg-primary"
@@ -124,32 +132,52 @@ export function About() {
             </div>
 
             <div className="relative w-full max-w-sm mx-auto group">
-              {/* Offset decorative border frame */}
+              {/* Gradient offset decorative border frame */}
               <div
-                className="absolute inset-0 border-2 border-primary translate-x-5 translate-y-5 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform duration-500 rounded-sm z-0"
+                className="absolute inset-0 translate-x-5 translate-y-5 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform duration-500 rounded-sm z-0"
+                style={{
+                  background: "linear-gradient(135deg, rgba(139,92,246,0.6) 0%, rgba(6,182,212,0.3) 100%)",
+                  padding: "2px",
+                }}
                 aria-hidden="true"
-              />
+              >
+                <div className="w-full h-full rounded-sm" style={{ background: "transparent" }} />
+              </div>
 
               {/* Ambient glow */}
               <div
-                className="absolute -inset-6 rounded-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 blur-2xl"
-                style={{ background: "radial-gradient(ellipse, rgba(139,92,246,0.25) 0%, transparent 70%)" }}
+                className="absolute -inset-6 rounded-2xl opacity-60 group-hover:opacity-90 transition-opacity duration-500 z-0 blur-2xl"
+                style={{ background: "radial-gradient(ellipse, rgba(139,92,246,0.28) 0%, transparent 70%)" }}
                 aria-hidden="true"
               />
 
               {/* Photo card */}
-              <div className="relative z-10 overflow-hidden rounded-sm bg-card border border-card-border">
-                {/* Corner accent marks */}
-                <div className="absolute -top-px -left-px w-4 h-4 border-t-2 border-l-2 border-primary z-20" aria-hidden="true" />
-                <div className="absolute -top-px -right-px w-4 h-4 border-t-2 border-r-2 border-primary z-20" aria-hidden="true" />
-                <div className="absolute -bottom-px -left-px w-4 h-4 border-b-2 border-l-2 border-primary z-20" aria-hidden="true" />
-                <div className="absolute -bottom-px -right-px w-4 h-4 border-b-2 border-r-2 border-primary z-20" aria-hidden="true" />
+              <div className="relative z-10 overflow-hidden rounded-sm glass-card">
+                {/* Gradient corner accent marks */}
+                <div className="absolute -top-px -left-px w-5 h-5 z-20" aria-hidden="true">
+                  <div className="absolute top-0 left-0 w-full h-[2px]" style={{ background: "linear-gradient(to right, rgba(139,92,246,0.9), transparent)" }} />
+                  <div className="absolute top-0 left-0 h-full w-[2px]" style={{ background: "linear-gradient(to bottom, rgba(139,92,246,0.9), transparent)" }} />
+                </div>
+                <div className="absolute -top-px -right-px w-5 h-5 z-20" aria-hidden="true">
+                  <div className="absolute top-0 right-0 w-full h-[2px]" style={{ background: "linear-gradient(to left, rgba(6,182,212,0.8), transparent)" }} />
+                  <div className="absolute top-0 right-0 h-full w-[2px]" style={{ background: "linear-gradient(to bottom, rgba(6,182,212,0.8), transparent)" }} />
+                </div>
+                <div className="absolute -bottom-px -left-px w-5 h-5 z-20" aria-hidden="true">
+                  <div className="absolute bottom-0 left-0 w-full h-[2px]" style={{ background: "linear-gradient(to right, rgba(139,92,246,0.6), transparent)" }} />
+                  <div className="absolute bottom-0 left-0 h-full w-[2px]" style={{ background: "linear-gradient(to top, rgba(139,92,246,0.6), transparent)" }} />
+                </div>
+                <div className="absolute -bottom-px -right-px w-5 h-5 z-20" aria-hidden="true">
+                  <div className="absolute bottom-0 right-0 w-full h-[2px]" style={{ background: "linear-gradient(to left, rgba(6,182,212,0.5), transparent)" }} />
+                  <div className="absolute bottom-0 right-0 h-full w-[2px]" style={{ background: "linear-gradient(to top, rgba(6,182,212,0.5), transparent)" }} />
+                </div>
 
                 {/* Illustrated avatar */}
                 <motion.img
                   key="illustrated"
                   src="/avatar-illustrated.png"
                   alt="Anh Duy — illustrated developer avatar"
+                  width="400"
+                  height="500"
                   className="w-full h-auto object-cover block"
                   animate={{ opacity: showReal ? 0 : 1 }}
                   transition={{ duration: 0.45 }}
@@ -162,6 +190,8 @@ export function About() {
                   key="real"
                   src="/avatar.png"
                   alt="Anh Duy — real photo"
+                  width="400"
+                  height="500"
                   className="w-full h-auto object-cover object-top block"
                   animate={{ opacity: showReal ? 1 : 0 }}
                   transition={{ duration: 0.45 }}
@@ -176,7 +206,7 @@ export function About() {
 
                 {/* Label badge */}
                 <div className="absolute top-3 left-3 z-20">
-                  <span className="font-mono text-[10px] tracking-widest uppercase px-2 py-1 bg-black/60 backdrop-blur-sm border border-primary/30 text-primary rounded-sm">
+                  <span className="glass font-mono text-[10px] tracking-widest uppercase px-2 py-1 border border-primary/30 text-primary rounded-sm">
                     {showReal ? "Real" : "Illustrated"}
                   </span>
                 </div>

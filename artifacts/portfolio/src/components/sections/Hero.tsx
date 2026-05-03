@@ -110,6 +110,49 @@ export function Hero() {
       className="relative min-h-[100dvh] flex items-center overflow-hidden"
       onMouseMove={handleMove}
     >
+      {/* ── Ambient gradient orbs ─────────────────────────────── */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      >
+        {/* Violet orb — lower left */}
+        <div
+          className="absolute"
+          style={{
+            width: "60vw",
+            height: "60vw",
+            left: "-15vw",
+            bottom: "-10vw",
+            background: "radial-gradient(ellipse, rgba(139,92,246,0.18) 0%, rgba(109,40,217,0.08) 40%, transparent 70%)",
+            filter: "blur(60px)",
+          }}
+        />
+        {/* Cyan orb — upper right */}
+        <div
+          className="absolute"
+          style={{
+            width: "40vw",
+            height: "40vw",
+            right: "5vw",
+            top: "5vw",
+            background: "radial-gradient(ellipse, rgba(6,182,212,0.12) 0%, transparent 65%)",
+            filter: "blur(70px)",
+          }}
+        />
+        {/* Pink micro-orb — center */}
+        <div
+          className="absolute"
+          style={{
+            width: "22vw",
+            height: "22vw",
+            left: "38%",
+            top: "30%",
+            background: "radial-gradient(ellipse, rgba(192,132,252,0.10) 0%, transparent 65%)",
+            filter: "blur(50px)",
+          }}
+        />
+      </div>
+
       {/* ── Illustrated avatar — right half (desktop) ───────── */}
       <motion.div
         className="absolute right-0 top-0 bottom-0 w-[55%] pointer-events-none z-0 hidden lg:block"
@@ -125,40 +168,40 @@ export function Hero() {
             background: "linear-gradient(to right, #050505 0%, #050505 5%, rgba(5,5,5,0.7) 28%, rgba(5,5,5,0.15) 55%, transparent 100%)",
           }}
         />
-        {/* Bottom fade */}
         <div
           className="absolute inset-0 z-10"
           style={{ background: "linear-gradient(to top, #050505 0%, transparent 22%)" }}
         />
-        {/* Top fade */}
         <div
           className="absolute inset-0 z-10"
           style={{ background: "linear-gradient(to bottom, #050505 0%, transparent 16%)" }}
         />
 
-        {/* The illustrated avatar — fills the right panel */}
         <img
           src="/avatar-illustrated.png"
           alt="Anh Duy — illustrated developer avatar"
+          width="880"
+          height="1100"
           className="absolute inset-0 w-full h-full object-cover object-center"
           style={{ mixBlendMode: "luminosity", opacity: 0.92 }}
           draggable={false}
         />
-        {/* Same image with color overlay so it keeps purple tones */}
         <img
           src="/avatar-illustrated.png"
           alt=""
           aria-hidden="true"
+          width="880"
+          height="1100"
           className="absolute inset-0 w-full h-full object-cover object-center"
           style={{ opacity: 0.55 }}
           draggable={false}
         />
 
-        {/* Subtle ambient glow dot */}
+        {/* Ambient glow dot */}
         <div
           className="absolute bottom-[15%] right-[20%] w-48 h-48 rounded-full z-0"
           style={{
-            background: "radial-gradient(circle, rgba(139,92,246,0.3) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(139,92,246,0.35) 0%, transparent 70%)",
             filter: "blur(30px)",
           }}
           aria-hidden="true"
@@ -182,8 +225,9 @@ export function Hero() {
             Hi, my name is
           </motion.p>
 
+          {/* Gradient name */}
           <h1
-            className="leading-[0.92] mb-5 text-foreground"
+            className="leading-[0.92] mb-5"
             style={{
               fontFamily: "var(--app-font-display)",
               fontWeight: 800,
@@ -191,7 +235,7 @@ export function Hero() {
               letterSpacing: "-0.04em",
             }}
           >
-            Anh Duy.
+            <span className="gradient-text-vivid">Anh Duy.</span>
           </h1>
 
           <h2
@@ -224,12 +268,23 @@ export function Hero() {
             transition={{ duration: 0.7, delay: 0.4 }}
           >
             <div className="relative w-48 h-48">
+              {/* Gradient ring */}
+              <div
+                className="absolute -inset-0.5 rounded-full"
+                style={{
+                  background: "linear-gradient(135deg, rgba(139,92,246,0.8) 0%, rgba(6,182,212,0.4) 100%)",
+                  filter: "blur(2px)",
+                }}
+                aria-hidden="true"
+              />
               <div className="absolute inset-0 rounded-full border-2 border-primary/40" />
               <div className="absolute -inset-1 rounded-full border border-primary/15" />
               <div className="absolute inset-0 rounded-full bg-primary/10 blur-xl" />
               <img
                 src="/avatar-illustrated.png"
                 alt="Anh Duy"
+                width="192"
+                height="192"
                 className="relative w-full h-full object-cover object-top rounded-full z-10"
                 style={{ filter: "drop-shadow(0 0 20px rgba(139,92,246,0.5))" }}
                 draggable={false}
@@ -238,17 +293,19 @@ export function Hero() {
           </motion.div>
 
           <div className="flex flex-wrap gap-4 items-center">
+            {/* Primary: gradient CTA */}
             <MagneticCTA
               href="#projects"
-              className="inline-flex items-center gap-3 bg-primary text-primary-foreground px-8 py-4 font-semibold text-sm tracking-wide rounded-xl hover:bg-primary/90 transition-colors"
+              className="gradient-btn inline-flex items-center gap-3 text-white px-8 py-4 font-semibold text-sm tracking-wide rounded-xl"
             >
               View My Work
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </MagneticCTA>
 
+            {/* Secondary: glass panel with gradient border */}
             <MagneticCTA
               href="#contact"
-              className="glass neon-violet inline-flex items-center gap-2 text-muted-foreground px-7 py-4 font-mono text-sm rounded-xl hover:text-foreground transition-colors"
+              className="glass-panel gradient-border inline-flex items-center gap-2 text-muted-foreground px-7 py-4 font-mono text-sm rounded-xl hover:text-foreground transition-colors duration-300"
             >
               Get in touch
             </MagneticCTA>
