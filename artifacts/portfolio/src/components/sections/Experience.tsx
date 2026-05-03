@@ -100,7 +100,8 @@ export function Experience() {
                   {/* Company avatar — glass with gradient border */}
                   <div
                     className="absolute left-[-45px] md:left-1/2 w-10 h-10 -ml-[4px] md:-ml-0 rounded-full md:-translate-x-1/2 z-10 flex items-center justify-center font-bold transition-transform duration-300 group-hover:scale-110"
-                    aria-label={exp.company}
+                    role="img"
+                    aria-label={`${exp.company} logo`}
                     style={{
                       background: `linear-gradient(135deg, rgba(14,14,24,0.9) 0%, rgba(8,8,18,0.95) 100%)`,
                       border: `2px solid ${exp.color}`,

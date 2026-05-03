@@ -362,11 +362,18 @@
   .gradient-btn {
     background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 50%, #6d28d9 100%);
     background-size: 200% 200%;
-    transition: background-position 0.4s ease, box-shadow 0.3s ease, opacity 0.2s;
+    background-position: left center;
+    cursor: pointer;
+    transition: background-position 0.45s ease, box-shadow 0.3s ease, opacity 0.2s, transform 0.15s ease;
   }
   .gradient-btn:hover {
     background-position: right center;
-    box-shadow: 0 0 28px rgba(139, 92, 246, 0.45), 0 4px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 32px rgba(139, 92, 246, 0.50), 0 4px 20px rgba(0, 0, 0, 0.45);
+    transform: translateY(-1px);
+  }
+  .gradient-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 0 16px rgba(139, 92, 246, 0.35), 0 2px 8px rgba(0, 0, 0, 0.35);
   }
 
   /* ── Gradient input focus ────────────────────────────────── */
@@ -378,14 +385,15 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     touch-action: manipulation;
   }
-  .input-glass:focus {
+  .input-glass:focus,
+  .input-glass:focus-visible {
     outline: none;
-    border-color: rgba(139, 92, 246, 0.55);
-    background: rgba(14, 10, 28, 0.72);
+    border-color: rgba(139, 92, 246, 0.60);
+    background: rgba(14, 10, 28, 0.80);
     box-shadow:
-      0 0 0 3px rgba(139, 92, 246, 0.12),
-      0 0 16px rgba(139, 92, 246, 0.15),
-      inset 0 1px 0 rgba(139, 92, 246, 0.06);
+      0 0 0 3px rgba(139, 92, 246, 0.15),
+      0 0 20px rgba(139, 92, 246, 0.12),
+      inset 0 1px 0 rgba(139, 92, 246, 0.08);
   }
 
   /* ── Neon bottom glow — enhanced + hover state ─────────── */
@@ -537,8 +545,8 @@
 }
 
 @keyframes float-up {
-  0%   { transform: translateY(0)   opacity: 0.6; }
-  100% { transform: translateY(-20px); opacity: 0; }
+  0%   { transform: translateY(0);      opacity: 0.6; }
+  100% { transform: translateY(-20px);  opacity: 0; }
 }
 
 @keyframes glow-pulse {

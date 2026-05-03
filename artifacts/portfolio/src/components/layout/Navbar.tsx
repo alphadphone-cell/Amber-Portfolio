@@ -33,6 +33,15 @@ export function Navbar() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsMobileMenuOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [isMobileMenuOpen]);
+
   return (
     <>
       {/* Gradient scroll progress bar */}
@@ -41,6 +50,7 @@ export function Navbar() {
         aria-label="Page scroll progress"
         aria-valuemin={0}
         aria-valuemax={100}
+        aria-valuenow={0}
         className="fixed top-0 left-0 right-0 h-[2px] z-[60] origin-left"
         style={{
           scaleX,

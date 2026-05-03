@@ -182,6 +182,7 @@ export function Hero() {
           alt="Anh Duy — illustrated developer avatar"
           width="880"
           height="1100"
+          fetchPriority="high"
           className="absolute inset-0 w-full h-full object-cover object-center"
           style={{ mixBlendMode: "luminosity", opacity: 0.92 }}
           draggable={false}
@@ -214,7 +215,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-[52%] lg:max-w-xl"
+          className="w-full max-w-full md:max-w-[58%] lg:max-w-xl"
         >
           <motion.p
             className="font-mono text-[11px] tracking-[0.4em] text-primary uppercase mb-6"

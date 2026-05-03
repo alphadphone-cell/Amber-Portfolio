@@ -18,12 +18,13 @@ export function Footer() {
           <p className="text-sm text-muted-foreground">Building exceptional digital experiences.</p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-6">
-          <a href="#about"      className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors">01. About</a>
-          <a href="#projects"   className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors">02. Projects</a>
-          <a href="#experience" className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors">03. Experience</a>
-          <a href="#blog"       className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors">05. Blog</a>
-        </div>
+        <nav className="flex flex-wrap justify-center gap-6" aria-label="Footer navigation">
+          <a href="#about"      className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">01. About</a>
+          <a href="#projects"   className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">02. Projects</a>
+          <a href="#experience" className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">03. Experience</a>
+          <a href="#blog"       className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">04. Blog</a>
+          <a href="#contact"    className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded-sm">05. Contact</a>
+        </nav>
 
         <div className="flex flex-col items-end gap-4">
           {activeSocials.length > 0 && (

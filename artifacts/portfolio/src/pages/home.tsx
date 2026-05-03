@@ -15,6 +15,12 @@ import { ScrollFrame, DataStream } from "@/components/ScrollFrame";
 export default function Home() {
   return (
     <>
+      <a
+        href="#main-content"
+        className="skip-link"
+      >
+        Skip to main content
+      </a>
       <ShaderBackground />
       <ScrollProgress />
       <DataStream side="left" />

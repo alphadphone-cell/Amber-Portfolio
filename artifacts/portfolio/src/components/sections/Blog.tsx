@@ -17,7 +17,7 @@ export function Blog() {
           className="mb-16"
         >
           <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-4 mb-4">
-            <span className="gradient-text font-mono text-xl font-normal">05.</span>
+            <span className="gradient-text font-mono text-xl font-normal">04.</span>
             Writing
             <div
               className="h-[1px] flex-1 max-w-xs ml-4"

@@ -51,9 +51,9 @@ export function About() {
               className="glass-panel rounded-2xl p-6 grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
             >
               {stats.map(({ value, label }) => (
-                <div key={label} className="text-center md:text-left">
-                  <dd className="text-3xl font-black gradient-text-vivid tabular-nums">{value}</dd>
-                  <dt className="text-xs font-mono mt-1 text-muted-foreground tracking-wider uppercase">{label}</dt>
+                <div key={label} className="text-center md:text-left flex flex-col">
+                  <dt className="text-xs font-mono text-muted-foreground tracking-wider uppercase" style={{ order: 2, marginTop: "4px" }}>{label}</dt>
+                  <dd className="text-3xl font-black gradient-text-vivid tabular-nums" style={{ order: 1, margin: 0 }}>{value}</dd>
                 </div>
               ))}
             </motion.dl>

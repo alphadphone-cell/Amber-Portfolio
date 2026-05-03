@@ -50,7 +50,7 @@ export function Contact() {
           className="mb-16"
         >
           <h2 id="contact-heading" className="text-3xl md:text-4xl font-bold flex items-center gap-4 mb-4">
-            <span className="gradient-text font-mono text-xl font-normal">04.</span>
+            <span className="gradient-text font-mono text-xl font-normal">05.</span>
             Get in Touch
             <div
               className="h-[1px] flex-1 max-w-xs ml-4"
@@ -164,13 +164,14 @@ export function Contact() {
                     id="contact-name"
                     type="text"
                     required
+                    aria-required="true"
                     autoComplete="name"
                     name="name"
                     value={form.name}
                     onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                     placeholder="Your name…"
                     spellCheck={false}
-                    className="input-glass w-full rounded-xl px-5 py-4 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-0"
+                    className="input-glass w-full rounded-xl px-5 py-4 text-foreground placeholder:text-muted-foreground/40"
                   />
                 </div>
 
@@ -182,6 +183,7 @@ export function Contact() {
                     id="contact-email"
                     type="email"
                     required
+                    aria-required="true"
                     autoComplete="email"
                     name="email"
                     inputMode="email"
@@ -189,7 +191,7 @@ export function Contact() {
                     onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
                     placeholder="your@email.com…"
                     spellCheck={false}
-                    className="input-glass w-full rounded-xl px-5 py-4 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-0"
+                    className="input-glass w-full rounded-xl px-5 py-4 text-foreground placeholder:text-muted-foreground/40"
                   />
                 </div>
 
@@ -200,12 +202,13 @@ export function Contact() {
                   <textarea
                     id="contact-message"
                     required
+                    aria-required="true"
                     name="message"
                     value={form.message}
                     onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
                     placeholder="What's on your mind?…"
                     rows={6}
-                    className="input-glass w-full rounded-xl px-5 py-4 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-0 resize-none"
+                    className="input-glass w-full rounded-xl px-5 py-4 text-foreground placeholder:text-muted-foreground/40 resize-none"
                   />
                 </div>
 
@@ -213,7 +216,6 @@ export function Contact() {
                   type="submit"
                   disabled={status === "sending" || status === "sent"}
                   className="gradient-btn flex items-center gap-3 text-white px-8 py-4 font-semibold text-sm rounded-xl disabled:opacity-50 disabled:cursor-not-allowed w-full justify-center group"
-                  aria-live="polite"
                   style={{ touchAction: "manipulation" }}
                 >
                   {status === "sending" && (
@@ -226,11 +228,18 @@ export function Contact() {
                   )}
                 </button>
 
-                {status === "sent" && (
-                  <p className="text-center text-sm text-green-400 font-mono" role="status" aria-live="polite">
-                    Thanks! I&apos;ll get back to you soon.
-                  </p>
-                )}
+                <div role="status" aria-live="polite" aria-atomic="true" className="min-h-[1.5rem]">
+                  {status === "sent" && (
+                    <p className="text-center text-sm text-green-400 font-mono">
+                      Thanks! I&apos;ll get back to you soon.
+                    </p>
+                  )}
+                  {status === "error" && (
+                    <p className="text-center text-sm text-red-400 font-mono">
+                      Something went wrong. Please try again.
+                    </p>
+                  )}
+                </div>
               </form>
             </div>
           </motion.div>

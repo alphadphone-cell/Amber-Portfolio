@@ -123,6 +123,8 @@ function ProjectCard({
             src={project.image}
             alt={`${project.title} screenshot`}
             className="w-full h-full object-cover object-top"
+            loading="lazy"
+            decoding="async"
             animate={{ scale: hovered ? 1.07 : 1 }}
             transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
             draggable={false}
@@ -153,27 +155,28 @@ function ProjectCard({
             />
           </div>
 
-          {/* Project links — float in from top-right */}
+          {/* Project links — visible on hover/focus for keyboard accessibility */}
           <div
-            className="absolute top-3 right-3 flex gap-2 transition-all duration-300"
+            className="absolute top-3 right-3 flex gap-2 transition-all duration-300 opacity-0 group-hover:opacity-100 focus-within:opacity-100 focus-within:translate-y-0"
             style={{
-              opacity: hovered ? 1 : 0,
-              transform: hovered ? "translateY(0) translateZ(30px)" : "translateY(-8px) translateZ(30px)",
+              transform: hovered ? "translateY(0) translateZ(30px)" : "translateY(-6px) translateZ(30px)",
             }}
           >
             <a
               href={project.github}
-              className="w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:border-primary/60 transition-colors rounded-md"
+              className="w-11 h-11 flex items-center justify-center bg-black/60 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:border-primary/60 focus-visible:text-white focus-visible:border-primary/60 focus-visible:ring-2 focus-visible:ring-primary transition-colors rounded-md"
               aria-label={`${project.title} on GitHub`}
+              style={{ touchAction: "manipulation" }}
             >
-              <Github className="w-3.5 h-3.5" aria-hidden="true" />
+              <Github className="w-4 h-4" aria-hidden="true" />
             </a>
             <a
               href={project.external}
-              className="w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:border-primary/60 transition-colors rounded-md"
+              className="w-11 h-11 flex items-center justify-center bg-black/60 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:border-primary/60 focus-visible:text-white focus-visible:border-primary/60 focus-visible:ring-2 focus-visible:ring-primary transition-colors rounded-md"
               aria-label={`${project.title} live demo`}
+              style={{ touchAction: "manipulation" }}
             >
-              <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+              <ExternalLink className="w-4 h-4" aria-hidden="true" />
             </a>
           </div>
         </div>
