@@ -1,5 +1,6 @@
 import { activeSocials } from "../../config/socials";
 import { SocialIcon } from "../SocialIcon";
+import { SpotifyWidget } from "../SpotifyWidget";
 
 export function Footer() {
   return (
@@ -54,6 +55,9 @@ export function Footer() {
         </nav>
 
         <div className="flex flex-col items-end gap-4">
+          {/* Spotify now-playing widget */}
+          <SpotifyWidget />
+
           {activeSocials.length > 0 && (
             <ul className="flex gap-4 m-0 p-0 list-none">
               {activeSocials.map((s) => (
