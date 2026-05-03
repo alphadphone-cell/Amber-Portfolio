@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/obsidian-ember/"
+title = "Obsidian Ember Portfolio"
+version = "1.0.0"
+id = "artifacts/obsidian-ember"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/obsidian-ember/" ]
+localPort = 18591
+
+[services.development]
+run = "pnpm --filter @workspace/obsidian-ember run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/obsidian-ember", "run", "build" ]
+publicDir = "artifacts/obsidian-ember/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18591"
+BASE_PATH = "/obsidian-ember/"

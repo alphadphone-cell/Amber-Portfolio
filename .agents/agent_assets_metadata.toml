@@ -42,3 +42,21 @@ id = "mTaUnWfeHwdUhB6RHYaby"
 uri = "file://artifacts/mockup-sandbox/public/images/avatar-forest.png"
 type = "image"
 title = "Forest developer avatar illustration"
+
+[[generated]]
+id = "wVSjyFXsP6WQVzewmxI9N"
+uri = "file://artifacts/obsidian-ember/public/project-forge.png"
+type = "image"
+title = "Dark terminal code aesthetic"
+
+[[generated]]
+id = "k_C4Tt9jT5EWrVRF_f9dm"
+uri = "file://artifacts/obsidian-ember/public/project-cli.png"
+type = "image"
+title = "CLI tool interface"
+
+[[generated]]
+id = "TdR7IfYmrt8GCUTMNpais"
+uri = "file://artifacts/obsidian-ember/public/project-db.png"
+type = "image"
+title = "Database visualization"
