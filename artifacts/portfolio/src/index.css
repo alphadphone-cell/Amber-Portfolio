@@ -186,13 +186,22 @@
     cursor: none !important;
   }
 
-  /* Body */
+  /* Body — solid void; shader canvas provides all visual texture */
   body {
     @apply font-sans antialiased bg-background text-foreground relative;
     background-color: #050505;
+  }
+
+  /* Dot-grid overlay rendered above the shader canvas */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
     background-image: radial-gradient(
       circle,
-      rgba(139, 92, 246, 0.07) 1px,
+      rgba(139, 92, 246, 0.10) 1px,
       transparent 1px
     );
     background-size: 32px 32px;
