@@ -30,3 +30,15 @@ id = "YwTaEQJ4hP1yzeJneZ4SG"
 uri = "file://artifacts/portfolio/public/project-spectra.png"
 type = "image"
 title = "spectra kubernetes observability platform"
+
+[[generated]]
+id = "VEQdJ_OsGNMBopqRYy6Fm"
+uri = "file://artifacts/mockup-sandbox/public/images/avatar-ember.png"
+type = "image"
+title = "Ember forge glowing illustrated avatar"
+
+[[generated]]
+id = "mTaUnWfeHwdUhB6RHYaby"
+uri = "file://artifacts/mockup-sandbox/public/images/avatar-forest.png"
+type = "image"
+title = "Forest developer avatar illustration"
