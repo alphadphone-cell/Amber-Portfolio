@@ -7,7 +7,7 @@ const projects = [
     title: "Forge Queue",
     description:
       "A highly resilient, distributed task queue built with Go and Redis Streams. Designed for high-throughput environments, capable of processing millions of background jobs with guaranteed at-least-once delivery, automatic retries, and comprehensive telemetry.",
-    image: "/project-forge.png",
+    image: `${import.meta.env.BASE_URL}project-forge.png`,
     tech: ["Go", "Redis", "Docker", "Prometheus"],
     github: "#",
     demo: "#",
@@ -16,7 +16,7 @@ const projects = [
     title: "Ember CLI",
     description:
       "A lightning-fast, extensible command-line tool for scaffolding and managing complex microservice architectures. Written in Rust for minimal footprint and maximum execution speed, featuring a plugin system and interactive terminal UI.",
-    image: "/project-cli.png",
+    image: `${import.meta.env.BASE_URL}project-cli.png`,
     tech: ["Rust", "Clap", "Tokio", "WebAssembly"],
     github: "#",
     demo: "#",
@@ -25,7 +25,7 @@ const projects = [
     title: "HoverKit 3D",
     description:
       "A GPU-accelerated 3D hover-effects library delivering buttery-smooth perspective tilts, magnetic interactions, and depth-of-field glows. Zero runtime dependencies, tree-shakeable, and used by 500+ projects on npm with a one-line init API.",
-    image: "/project-3dhover.svg",
+    image: `${import.meta.env.BASE_URL}project-3dhover.svg`,
     tech: ["TypeScript", "WebGL", "GSAP", "CSS Houdini"],
     github: "#",
     demo: "#",
@@ -34,7 +34,7 @@ const projects = [
     title: "RedLine DB",
     description:
       "An experimental, embeddable time-series database optimized for IoT workloads. Implements a custom storage engine leveraging memory-mapped files and a bespoke query language for rapid aggregations over massive datasets.",
-    image: "/project-db.png",
+    image: `${import.meta.env.BASE_URL}project-db.png`,
     tech: ["C++", "gRPC", "RocksDB", "React"],
     github: "#",
     demo: "#",
