@@ -1,7 +1,15 @@
 import { useRef } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  useMotionTemplate,
+  useReducedMotion,
+} from "framer-motion";
 import { Github, ExternalLink, Code } from "lucide-react";
 
+/* ─── project data ─────────────────────────────────────── */
 const projects = [
   {
     title: "Forge Queue",
@@ -24,7 +32,7 @@ const projects = [
   {
     title: "HoverKit 3D",
     description:
-      "A GPU-accelerated 3D hover-effects library delivering buttery-smooth perspective tilts, magnetic interactions, and depth-of-field glows. Zero runtime dependencies, tree-shakeable, and used by 500+ projects on npm with a one-line init API.",
+      "A GPU-accelerated 3D hover-effects library delivering buttery-smooth perspective tilts, magnetic interactions, and depth-of-field glows. Zero runtime dependencies, tree-shakeable, used by 500+ projects on npm.",
     image: `${import.meta.env.BASE_URL}project-3dhover.svg`,
     tech: ["TypeScript", "WebGL", "GSAP", "CSS Houdini"],
     github: "#",
@@ -41,99 +49,234 @@ const projects = [
   },
 ];
 
-function ProjectCard({ project, index }: { project: (typeof projects)[0]; index: number }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const rotateX = useMotionValue(0);
-  const rotateY = useMotionValue(0);
-  const springX = useSpring(rotateX, { stiffness: 200, damping: 30 });
-  const springY = useSpring(rotateY, { stiffness: 200, damping: 30 });
-  const glowX = useTransform(springY, [-12, 12], ["20%", "80%"]);
-  const glowY = useTransform(springX, [-12, 12], ["20%", "80%"]);
-  const scale = useSpring(1, { stiffness: 220, damping: 28 });
+/* ─── spring configs ───────────────────────────────────── */
+const TILT_SPRING = { stiffness: 340, damping: 28, mass: 0.4 };
+const PARA_SPRING = { stiffness: 140, damping: 22, mass: 1.2 };
+const FADE_SPRING = { stiffness: 180, damping: 24 };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    rotateY.set(((e.clientX - cx) / (rect.width / 2)) * 10);
-    rotateX.set((-(e.clientY - cy) / (rect.height / 2)) * 8);
-    scale.set(1.02);
-  };
-  const handleMouseLeave = () => {
-    rotateX.set(0);
-    rotateY.set(0);
-    scale.set(1);
-  };
+/* ─── 3D hover image ───────────────────────────────────── */
+function ProjectImage({ src, alt }: { src: string; alt: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
 
+  /* raw normalised mouse positions: –1 → +1 */
+  const nx = useMotionValue(0);
+  const ny = useMotionValue(0);
+
+  /* spring-smoothed active state for overlay animations */
+  const rawActive = useMotionValue(0);
+  const active = useSpring(rawActive, FADE_SPRING);
+
+  /* tilt (card rotation) */
+  const rotateY = useSpring(useTransform(nx, [-1, 1], [-14, 14]), TILT_SPRING);
+  const rotateX = useSpring(useTransform(ny, [-1, 1], [10, -10]), TILT_SPRING);
+  const scale   = useSpring(1, { stiffness: 300, damping: 28 });
+
+  /* image parallax — moves opposite to tilt, slower spring → deeper feel */
+  const imgX = useSpring(useTransform(nx, [-1, 1], [16, -16]), PARA_SPRING);
+  const imgY = useSpring(useTransform(ny, [-1, 1], [11, -11]), PARA_SPRING);
+
+  /* specular highlight: bright ellipse at cursor position */
+  const specX = useTransform(nx, [-1, 1], ["8%",  "92%"]);
+  const specY = useTransform(ny, [-1, 1], ["8%",  "92%"]);
+
+  /* foil iridescence: moves at 40% of cursor speed, opposite direction */
+  const foilX = useTransform(nx, [-1, 1], ["70%", "30%"]);
+  const foilY = useTransform(ny, [-1, 1], ["70%", "30%"]);
+
+  /* directional shadow — physically shifts based on tilt angle */
+  const shadowDx = useTransform(rotateY, [-14, 14], [26, -26]);
+  const shadowDy = useTransform(rotateX, [10, -10], [-18, 18]);
+  const boxShadow = useMotionTemplate`${shadowDx}px ${shadowDy}px 80px rgba(0,0,0,0.8), 0 6px 24px rgba(0,0,0,0.55), 0 0 60px rgba(245,158,11,0.10)`;
+
+  /* gradient strings built from motion values */
+  const specBg = useMotionTemplate`radial-gradient(ellipse 52% 44% at ${specX} ${specY}, rgba(255,255,255,0.15) 0%, rgba(245,158,11,0.07) 42%, transparent 68%)`;
+  const foilBg = useMotionTemplate`radial-gradient(ellipse 58% 50% at ${foilX} ${foilY}, rgba(245,158,11,0.30) 0%, rgba(220,38,38,0.18) 42%, rgba(99,102,241,0.06) 72%, transparent 88%)`;
+
+  /* image grayscale fades to 0 as card becomes active */
+  const grayPct  = useTransform(active, [0, 1], [38, 0]);
+  const imgFilter = useMotionTemplate`grayscale(${grayPct}%)`;
+
+  /* dim overlay fades out on hover */
+  const dimOpacity = useTransform(active, [0, 1], [0.42, 0]);
+
+  /* rim border alpha */
+  const rimAlpha  = useTransform(active, [0, 1], [0.2, 0.6]);
+  const rimShadow = useMotionTemplate`inset 0 0 0 1.5px rgba(245,158,11,${rimAlpha})`;
+
+  /* corner accent opacity */
+  const cornerOpacity = useTransform(active, [0, 1], [0.35, 1.0]);
+
+  /* scanline opacity */
+  const scanOpacity = useTransform(active, [0, 1], [0, 1]);
+
+  /* event handlers */
+  const onMove = (e: React.MouseEvent) => {
+    if (!ref.current || reducedMotion) return;
+    const r = ref.current.getBoundingClientRect();
+    nx.set((e.clientX - r.left) / r.width  * 2 - 1);
+    ny.set((e.clientY - r.top)  / r.height * 2 - 1);
+  };
+  const onEnter = () => { scale.set(1.03); rawActive.set(1); };
+  const onLeave = () => { nx.set(0); ny.set(0); scale.set(1); rawActive.set(0); };
+
+  return (
+    <div style={{ perspective: "1000px" }} className="w-full">
+      <motion.div
+        ref={ref}
+        className="relative rounded-xl overflow-hidden aspect-[16/9] cursor-none select-none"
+        style={{
+          rotateX: reducedMotion ? 0 : rotateX,
+          rotateY: reducedMotion ? 0 : rotateY,
+          scale,
+          boxShadow,
+          willChange: "transform",
+        }}
+        onMouseMove={onMove}
+        onMouseEnter={onEnter}
+        onMouseLeave={onLeave}
+        aria-label={alt}
+      >
+
+        {/* ── LAYER 1: Parallax image (oversized so shift never shows edge) ── */}
+        <motion.div
+          className="absolute pointer-events-none"
+          style={{
+            top: "-8%", left: "-8%",
+            width: "116%", height: "116%",
+            x: reducedMotion ? 0 : imgX,
+            y: reducedMotion ? 0 : imgY,
+          }}
+        >
+          <motion.img
+            src={src}
+            alt={alt}
+            className="w-full h-full object-cover"
+            style={{ filter: imgFilter }}
+            draggable={false}
+            loading="lazy"
+          />
+        </motion.div>
+
+        {/* ── LAYER 2: Dark dim overlay (fades out on hover) ── */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none z-10"
+          style={{ backgroundColor: "#060402", opacity: dimOpacity }}
+        />
+
+        {/* ── LAYER 3: Specular highlight (tracks cursor precisely) ── */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none z-20"
+          style={{ background: specBg }}
+        />
+
+        {/* ── LAYER 4: Foil / iridescence (opposite cursor, soft-light blend) ── */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none z-30 mix-blend-soft-light"
+          style={{ background: foilBg }}
+        />
+
+        {/* ── LAYER 5: Amber scanline sweep ── */}
+        <motion.div
+          className="absolute left-0 right-0 h-[3px] pointer-events-none z-40"
+          style={{
+            background: "linear-gradient(to right, transparent 0%, rgba(245,158,11,0.85) 50%, transparent 100%)",
+            opacity: scanOpacity,
+            filter: "blur(0.5px)",
+          }}
+          animate={{ top: ["-3%", "106%"] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: "linear" }}
+        />
+
+        {/* ── LAYER 6: Rim border (brightens on hover) ── */}
+        <motion.div
+          className="absolute inset-0 rounded-xl pointer-events-none z-50"
+          style={{ boxShadow: rimShadow }}
+        />
+
+        {/* ── LAYER 7: Corner accents ── */}
+        {(
+          [
+            "top-0 left-0 border-t-2 border-l-2",
+            "top-0 right-0 border-t-2 border-r-2",
+            "bottom-0 left-0 border-b-2 border-l-2",
+            "bottom-0 right-0 border-b-2 border-r-2",
+          ] as const
+        ).map((cls, i) => (
+          <motion.div
+            key={i}
+            className={`absolute w-6 h-6 pointer-events-none z-50 ${cls}`}
+            style={{
+              borderColor: "#f59e0b",
+              opacity: cornerOpacity,
+              filter: "drop-shadow(0 0 5px rgba(245,158,11,0.8))",
+            }}
+          />
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+/* ─── single project row ───────────────────────────────── */
+function ProjectCard({
+  project,
+  index,
+}: {
+  project: (typeof projects)[0];
+  index: number;
+}) {
   const isReversed = index % 2 === 1;
 
   return (
     <motion.div
-      key={project.title}
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 44 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, delay: index * 0.08 }}
-      className={`flex flex-col ${isReversed ? "lg:flex-row-reverse" : "lg:flex-row"} gap-8 lg:gap-14 items-center`}
+      transition={{ duration: 0.6, delay: index * 0.07 }}
+      className={`flex flex-col ${
+        isReversed ? "lg:flex-row-reverse" : "lg:flex-row"
+      } gap-8 lg:gap-14 items-center`}
     >
-      {/* Project image with 3D tilt */}
-      <div className="w-full lg:w-3/5 relative group" style={{ perspective: 900 }}>
-        <motion.div
-          ref={cardRef}
-          className="relative rounded-xl overflow-hidden ember-glass aspect-[16/9] cursor-none"
-          style={{
-            rotateX: springX,
-            rotateY: springY,
-            scale,
-            transformStyle: "preserve-3d",
-            boxShadow: "0 0 30px rgba(0,0,0,0.8)",
-          }}
-          whileHover={{ boxShadow: "0 0 50px rgba(245,158,11,0.22), 0 24px 60px rgba(0,0,0,0.8)" }}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-          transition={{ duration: 0.35 }}
-        >
-          {/* Dynamic glow overlay */}
-          <motion.div
-            className="absolute inset-0 z-10 pointer-events-none rounded-xl"
-            style={{
-              background: `radial-gradient(circle at ${glowX} ${glowY}, rgba(245,158,11,0.18) 0%, rgba(220,38,38,0.08) 40%, transparent 65%)`,
-            }}
-          />
-          <div className="absolute inset-0 bg-secondary/10 group-hover:bg-transparent transition-colors duration-500 z-10 mix-blend-overlay pointer-events-none" />
-          <img
-            src={project.image}
-            alt={project.title}
-            className="w-full h-full object-cover grayscale-[35%] group-hover:grayscale-0 group-hover:scale-[1.04] transition-all duration-700"
-            draggable={false}
-          />
-          {/* Scanline sheen on hover */}
-          <motion.div
-            className="absolute left-0 right-0 h-[2px] z-20 pointer-events-none opacity-0 group-hover:opacity-100"
-            style={{ background: "linear-gradient(to right, transparent, rgba(245,158,11,0.6), transparent)" }}
-            animate={{ top: ["-2%", "105%"] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
-          />
-        </motion.div>
+      {/* ── image column ── */}
+      <div className="w-full lg:w-3/5 relative">
+        <ProjectImage src={project.image} alt={project.title} />
 
-        {/* Decorative border ghost */}
+        {/* decorative offset ghost border */}
         <motion.div
-          className={`absolute top-4 ${isReversed ? "-left-4" : "-right-4"} w-full h-full border rounded-xl z-0`}
-          style={{ borderColor: "rgba(245,158,11,0.18)" }}
-          whileHover={{ x: isReversed ? -6 : 6, y: 6, borderColor: "rgba(245,158,11,0.35)" }}
-          transition={{ duration: 0.3 }}
+          className={`absolute top-4 ${
+            isReversed ? "-left-4" : "-right-4"
+          } w-full h-full border rounded-xl -z-10`}
+          style={{ borderColor: "rgba(245,158,11,0.16)", aspectRatio: "16/9" }}
+          whileHover={{
+            x: isReversed ? -7 : 7,
+            y: 7,
+            borderColor: "rgba(245,158,11,0.36)",
+          }}
+          transition={{ duration: 0.35 }}
         />
       </div>
 
-      {/* Info panel */}
-      <div className={`w-full lg:w-2/5 flex flex-col ${isReversed ? "lg:items-start lg:text-left" : "lg:items-end lg:text-right"} z-20`}>
-        <div className="flex items-center gap-2 font-mono text-sm mb-2" style={{ color: "#f59e0b" }}>
+      {/* ── info column ── */}
+      <div
+        className={`w-full lg:w-2/5 flex flex-col z-20 ${
+          isReversed
+            ? "lg:items-start lg:text-left"
+            : "lg:items-end lg:text-right"
+        }`}
+      >
+        <div
+          className="flex items-center gap-2 font-mono text-sm mb-2"
+          style={{ color: "#f59e0b" }}
+        >
           <Code className="w-4 h-4" aria-hidden="true" />
           <span>Featured Project</span>
         </div>
 
-        <h3 className="text-3xl font-bold text-foreground mb-6 group" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <h3
+          className="text-3xl font-bold text-foreground mb-6"
+          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+        >
           <motion.a
             href={project.demo}
             style={{ color: "inherit" }}
@@ -145,17 +288,24 @@ function ProjectCard({ project, index }: { project: (typeof projects)[0]; index:
         </h3>
 
         <motion.div
-          className="ember-glass p-6 rounded-xl mb-6 shadow-xl relative"
+          className="ember-glass p-6 rounded-xl mb-6 shadow-xl"
           whileHover={{
             borderColor: "rgba(245,158,11,0.35)",
-            boxShadow: "0 0 24px rgba(245,158,11,0.08), 0 12px 40px rgba(0,0,0,0.5)",
+            boxShadow:
+              "0 0 24px rgba(245,158,11,0.08), 0 12px 40px rgba(0,0,0,0.5)",
           }}
           transition={{ duration: 0.25 }}
         >
-          <p className="text-muted-foreground leading-relaxed text-left">{project.description}</p>
+          <p className="text-muted-foreground leading-relaxed text-left">
+            {project.description}
+          </p>
         </motion.div>
 
-        <ul className={`flex flex-wrap gap-3 font-mono text-sm mb-8 ${isReversed ? "justify-start" : "lg:justify-end"}`}>
+        <ul
+          className={`flex flex-wrap gap-2.5 font-mono mb-8 ${
+            isReversed ? "justify-start" : "lg:justify-end"
+          }`}
+        >
           {project.tech.map((tech) => (
             <motion.li
               key={tech}
@@ -167,12 +317,12 @@ function ProjectCard({ project, index }: { project: (typeof projects)[0]; index:
               }}
               whileHover={{
                 background: "rgba(245,158,11,0.18)",
-                borderColor: "rgba(245,158,11,0.45)",
+                borderColor: "rgba(245,158,11,0.48)",
                 color: "#f59e0b",
-                scale: 1.06,
-                boxShadow: "0 0 10px rgba(245,158,11,0.2)",
+                scale: 1.07,
+                boxShadow: "0 0 12px rgba(245,158,11,0.22)",
               }}
-              transition={{ duration: 0.15 }}
+              transition={{ duration: 0.14 }}
             >
               {tech}
             </motion.li>
@@ -180,46 +330,39 @@ function ProjectCard({ project, index }: { project: (typeof projects)[0]; index:
         </ul>
 
         <div className="flex items-center gap-4">
-          <motion.a
-            href={project.github}
-            aria-label={`${project.title} GitHub`}
-            className="w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground"
-            style={{ background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.15)" }}
-            whileHover={{
-              color: "#f59e0b",
-              backgroundColor: "rgba(245,158,11,0.14)",
-              borderColor: "rgba(245,158,11,0.5)",
-              scale: 1.14,
-              boxShadow: "0 0 16px rgba(245,158,11,0.3)",
-            }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ duration: 0.18 }}
-          >
-            <Github className="w-5 h-5" />
-          </motion.a>
-          <motion.a
-            href={project.demo}
-            aria-label={`${project.title} live demo`}
-            className="w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground"
-            style={{ background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.15)" }}
-            whileHover={{
-              color: "#f59e0b",
-              backgroundColor: "rgba(245,158,11,0.14)",
-              borderColor: "rgba(245,158,11,0.5)",
-              scale: 1.14,
-              boxShadow: "0 0 16px rgba(245,158,11,0.3)",
-            }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ duration: 0.18 }}
-          >
-            <ExternalLink className="w-5 h-5" />
-          </motion.a>
+          {[
+            { href: project.github, Icon: Github,      label: `${project.title} GitHub` },
+            { href: project.demo,   Icon: ExternalLink, label: `${project.title} live demo` },
+          ].map(({ href, Icon, label }) => (
+            <motion.a
+              key={label}
+              href={href}
+              aria-label={label}
+              className="w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground"
+              style={{
+                background: "rgba(245,158,11,0.05)",
+                border: "1px solid rgba(245,158,11,0.16)",
+              }}
+              whileHover={{
+                color: "#f59e0b",
+                backgroundColor: "rgba(245,158,11,0.14)",
+                borderColor: "rgba(245,158,11,0.52)",
+                scale: 1.15,
+                boxShadow: "0 0 18px rgba(245,158,11,0.32)",
+              }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ duration: 0.16 }}
+            >
+              <Icon className="w-5 h-5" />
+            </motion.a>
+          ))}
         </div>
       </div>
     </motion.div>
   );
 }
 
+/* ─── section ──────────────────────────────────────────── */
 export function Projects() {
   return (
     <section id="projects" className="py-24 container mx-auto px-6">
@@ -233,7 +376,9 @@ export function Projects() {
           className="text-3xl md:text-4xl font-bold mb-4 flex items-center gap-3"
           style={{ fontFamily: "'Space Grotesk', sans-serif" }}
         >
-          <span className="text-secondary font-mono text-xl font-normal">04.</span>
+          <span className="text-secondary font-mono text-xl font-normal">
+            04.
+          </span>
           Featured Work
         </h2>
         <div className="w-20 h-1 bg-primary shadow-[0_0_10px_var(--color-primary)]" />
