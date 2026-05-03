@@ -47,9 +47,8 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **Sections**: Hero, About, Projects, Experience, Blog, Contact
 - **Components**: Preloader, CustomCursor (amber glow), Navbar (αD logo), Footer (BackgroundMusic + dormant SpotifyWidget)
 - **All public asset paths** must use `import.meta.env.BASE_URL` prefix — root-relative `/` paths 404 at this sub-path
-- **BackgroundMusic** (`src/components/BackgroundMusic.tsx`) — local ambient player UI, expects `public/ember-drift.mp3`, user-triggered only
+- **BackgroundMusic** (`src/components/BackgroundMusic.tsx`) — local ambient player UI, expects `public/ember-drift.mp3`, starts after first user interaction
 - **SpotifyWidget** (`src/components/SpotifyWidget.tsx`) — polls `/api/spotify/now-playing` every 30s; gracefully shows nothing when not connected
-- **Spotify integration**: connector `ccfg_spotify_01K49R1M6S088SR66BS9A0V4R7` — not authorized; user chose to keep widget dormant until later. Do not rely on it until manually connected.
 - **Project cards** (`src/components/sections/Projects.tsx`): 7-layer 3D hover (tilt, parallax image, specular highlight, foil iridescence, directional shadow, scanline, rim+corners) + magnetic pull within 220px via `useMagneticPull` hook. Respects `prefers-reduced-motion`.
 
 ### API Server (`artifacts/api-server`)

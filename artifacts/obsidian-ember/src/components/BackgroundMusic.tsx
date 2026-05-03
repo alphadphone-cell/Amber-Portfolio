@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Music2, Pause, Play, SkipForward } from "lucide-react";
 
@@ -15,12 +15,30 @@ export function BackgroundMusic() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [armed, setArmed] = useState(false);
   const track = TRACKS[0];
 
   const percent = useMemo(() => {
     if (!duration) return 0;
     return Math.min(100, Math.max(0, (progress / duration) * 100));
   }, [duration, progress]);
+
+  useEffect(() => {
+    const start = () => setArmed(true);
+    window.addEventListener("pointerdown", start, { once: true, passive: true });
+    window.addEventListener("keydown", start, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", start);
+      window.removeEventListener("keydown", start);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!armed) return;
+    const audio = audioRef.current;
+    if (!audio || !audio.paused) return;
+    void audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+  }, [armed]);
 
   const toggle = async () => {
     const audio = audioRef.current;
@@ -111,6 +129,7 @@ export function BackgroundMusic() {
         src={track.src}
         preload="metadata"
         loop
+        muted={!armed}
         onTimeUpdate={(e) => {
           const audio = e.currentTarget;
           setProgress(audio.currentTime);
@@ -127,7 +146,7 @@ export function BackgroundMusic() {
       />
 
       <p className="mt-2 text-[10px] font-mono" style={{ color: "rgba(245,158,11,0.38)" }}>
-        Add ember-drift.mp3 to public/ to enable the track.
+        Starts after your first interaction.
       </p>
     </motion.div>
   );
