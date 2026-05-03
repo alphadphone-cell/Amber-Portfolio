@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   motion,
   useMotionValue,
@@ -53,6 +53,59 @@ const projects = [
 const TILT_SPRING = { stiffness: 340, damping: 28, mass: 0.4 };
 const PARA_SPRING = { stiffness: 140, damping: 22, mass: 1.2 };
 const FADE_SPRING = { stiffness: 180, damping: 24 };
+/** Floaty, lazy spring for the magnetic pull layer */
+const MAG_SPRING  = { stiffness: 110, damping: 18, mass: 0.9 };
+
+/* ─────────────────────────────────────────────────────────
+   useMagneticPull
+   Attaches a single window mousemove listener. When the
+   cursor is within `threshold` px of the element's centre
+   it returns spring-animated x/y values that pull the
+   element toward the cursor by up to `maxPull` pixels.
+   The stable `anchorRef` never moves, so the rect is always
+   accurate and there is no feedback oscillation.
+───────────────────────────────────────────────────────── */
+function useMagneticPull(
+  anchorRef: React.RefObject<HTMLElement | null>,
+  disabled = false,
+  threshold = 220,
+  maxPull = 18,
+) {
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const x = useSpring(rawX, MAG_SPRING);
+  const y = useSpring(rawY, MAG_SPRING);
+
+  useEffect(() => {
+    if (disabled) return;
+
+    const onMove = (e: MouseEvent) => {
+      const el = anchorRef.current;
+      if (!el) return;
+      const r  = el.getBoundingClientRect();
+      const cx = r.left + r.width  / 2;
+      const cy = r.top  + r.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < threshold) {
+        /* pull strength falls off linearly with distance */
+        const force = (1 - dist / threshold) * maxPull;
+        rawX.set((dx / dist) * force);
+        rawY.set((dy / dist) * force);
+      } else {
+        rawX.set(0);
+        rawY.set(0);
+      }
+    };
+
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [anchorRef, disabled, threshold, maxPull, rawX, rawY]);
+
+  return { x, y };
+}
 
 /* ─── 3D hover image ───────────────────────────────────── */
 function ProjectImage({ src, alt }: { src: string; alt: string }) {
@@ -63,54 +116,47 @@ function ProjectImage({ src, alt }: { src: string; alt: string }) {
   const nx = useMotionValue(0);
   const ny = useMotionValue(0);
 
-  /* spring-smoothed active state for overlay animations */
+  /* spring-smoothed active state (0 = rest, 1 = hovered) */
   const rawActive = useMotionValue(0);
   const active = useSpring(rawActive, FADE_SPRING);
 
-  /* tilt (card rotation) */
+  /* tilt */
   const rotateY = useSpring(useTransform(nx, [-1, 1], [-14, 14]), TILT_SPRING);
   const rotateX = useSpring(useTransform(ny, [-1, 1], [10, -10]), TILT_SPRING);
   const scale   = useSpring(1, { stiffness: 300, damping: 28 });
 
-  /* image parallax — moves opposite to tilt, slower spring → deeper feel */
+  /* image parallax — moves opposite to tilt, slower spring */
   const imgX = useSpring(useTransform(nx, [-1, 1], [16, -16]), PARA_SPRING);
   const imgY = useSpring(useTransform(ny, [-1, 1], [11, -11]), PARA_SPRING);
 
-  /* specular highlight: bright ellipse at cursor position */
+  /* specular highlight: bright ellipse at exact cursor position */
   const specX = useTransform(nx, [-1, 1], ["8%",  "92%"]);
   const specY = useTransform(ny, [-1, 1], ["8%",  "92%"]);
 
-  /* foil iridescence: moves at 40% of cursor speed, opposite direction */
+  /* foil iridescence: opposite direction, 40% cursor speed */
   const foilX = useTransform(nx, [-1, 1], ["70%", "30%"]);
   const foilY = useTransform(ny, [-1, 1], ["70%", "30%"]);
 
-  /* directional shadow — physically shifts based on tilt angle */
+  /* directional shadow shifts with tilt angle */
   const shadowDx = useTransform(rotateY, [-14, 14], [26, -26]);
   const shadowDy = useTransform(rotateX, [10, -10], [-18, 18]);
   const boxShadow = useMotionTemplate`${shadowDx}px ${shadowDy}px 80px rgba(0,0,0,0.8), 0 6px 24px rgba(0,0,0,0.55), 0 0 60px rgba(245,158,11,0.10)`;
 
-  /* gradient strings built from motion values */
+  /* gradient strings */
   const specBg = useMotionTemplate`radial-gradient(ellipse 52% 44% at ${specX} ${specY}, rgba(255,255,255,0.15) 0%, rgba(245,158,11,0.07) 42%, transparent 68%)`;
   const foilBg = useMotionTemplate`radial-gradient(ellipse 58% 50% at ${foilX} ${foilY}, rgba(245,158,11,0.30) 0%, rgba(220,38,38,0.18) 42%, rgba(99,102,241,0.06) 72%, transparent 88%)`;
 
-  /* image grayscale fades to 0 as card becomes active */
-  const grayPct  = useTransform(active, [0, 1], [38, 0]);
+  /* image grayscale fades to 0 on hover */
+  const grayPct   = useTransform(active, [0, 1], [38, 0]);
   const imgFilter = useMotionTemplate`grayscale(${grayPct}%)`;
 
-  /* dim overlay fades out on hover */
+  /* dim overlay and rim driven by active spring */
   const dimOpacity = useTransform(active, [0, 1], [0.42, 0]);
-
-  /* rim border alpha */
-  const rimAlpha  = useTransform(active, [0, 1], [0.2, 0.6]);
-  const rimShadow = useMotionTemplate`inset 0 0 0 1.5px rgba(245,158,11,${rimAlpha})`;
-
-  /* corner accent opacity */
+  const rimAlpha   = useTransform(active, [0, 1], [0.2, 0.6]);
+  const rimShadow  = useMotionTemplate`inset 0 0 0 1.5px rgba(245,158,11,${rimAlpha})`;
   const cornerOpacity = useTransform(active, [0, 1], [0.35, 1.0]);
+  const scanOpacity   = useTransform(active, [0, 1], [0, 1]);
 
-  /* scanline opacity */
-  const scanOpacity = useTransform(active, [0, 1], [0, 1]);
-
-  /* event handlers */
   const onMove = (e: React.MouseEvent) => {
     if (!ref.current || reducedMotion) return;
     const r = ref.current.getBoundingClientRect();
@@ -137,8 +183,7 @@ function ProjectImage({ src, alt }: { src: string; alt: string }) {
         onMouseLeave={onLeave}
         aria-label={alt}
       >
-
-        {/* ── LAYER 1: Parallax image (oversized so shift never shows edge) ── */}
+        {/* ── LAYER 1: Parallax image ── */}
         <motion.div
           className="absolute pointer-events-none"
           style={{
@@ -158,19 +203,19 @@ function ProjectImage({ src, alt }: { src: string; alt: string }) {
           />
         </motion.div>
 
-        {/* ── LAYER 2: Dark dim overlay (fades out on hover) ── */}
+        {/* ── LAYER 2: Dim overlay ── */}
         <motion.div
           className="absolute inset-0 pointer-events-none z-10"
           style={{ backgroundColor: "#060402", opacity: dimOpacity }}
         />
 
-        {/* ── LAYER 3: Specular highlight (tracks cursor precisely) ── */}
+        {/* ── LAYER 3: Specular highlight ── */}
         <motion.div
           className="absolute inset-0 pointer-events-none z-20"
           style={{ background: specBg }}
         />
 
-        {/* ── LAYER 4: Foil / iridescence (opposite cursor, soft-light blend) ── */}
+        {/* ── LAYER 4: Foil iridescence ── */}
         <motion.div
           className="absolute inset-0 pointer-events-none z-30 mix-blend-soft-light"
           style={{ background: foilBg }}
@@ -188,7 +233,7 @@ function ProjectImage({ src, alt }: { src: string; alt: string }) {
           transition={{ duration: 2.6, repeat: Infinity, ease: "linear" }}
         />
 
-        {/* ── LAYER 6: Rim border (brightens on hover) ── */}
+        {/* ── LAYER 6: Rim border ── */}
         <motion.div
           className="absolute inset-0 rounded-xl pointer-events-none z-50"
           style={{ boxShadow: rimShadow }}
@@ -226,7 +271,20 @@ function ProjectCard({
   project: (typeof projects)[0];
   index: number;
 }) {
-  const isReversed = index % 2 === 1;
+  const isReversed      = index % 2 === 1;
+  const reducedMotion   = useReducedMotion();
+
+  /*
+   * anchorRef sits on the OUTER static div — its rect never moves
+   * so the distance calc is always accurate.
+   * The magnetic translation is applied to the INNER motion.div,
+   * which carries both the image and the ghost border together.
+   */
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const { x: magX, y: magY } = useMagneticPull(
+    anchorRef,
+    !!reducedMotion,
+  );
 
   return (
     <motion.div
@@ -239,22 +297,35 @@ function ProjectCard({
       } gap-8 lg:gap-14 items-center`}
     >
       {/* ── image column ── */}
-      <div className="w-full lg:w-3/5 relative">
-        <ProjectImage src={project.image} alt={project.title} />
-
-        {/* decorative offset ghost border */}
+      <div ref={anchorRef} className="w-full lg:w-3/5 relative">
+        {/* magnetic layer — wraps both image and ghost border */}
         <motion.div
-          className={`absolute top-4 ${
-            isReversed ? "-left-4" : "-right-4"
-          } w-full h-full border rounded-xl -z-10`}
-          style={{ borderColor: "rgba(245,158,11,0.16)", aspectRatio: "16/9" }}
-          whileHover={{
-            x: isReversed ? -7 : 7,
-            y: 7,
-            borderColor: "rgba(245,158,11,0.36)",
+          className="relative"
+          style={{
+            x: magX,
+            y: magY,
+            willChange: "transform",
           }}
-          transition={{ duration: 0.35 }}
-        />
+        >
+          <ProjectImage src={project.image} alt={project.title} />
+
+          {/* decorative offset ghost border (travels with magnetic pull) */}
+          <motion.div
+            className={`absolute top-4 ${
+              isReversed ? "-left-4" : "-right-4"
+            } w-full h-full border rounded-xl -z-10`}
+            style={{
+              borderColor: "rgba(245,158,11,0.16)",
+              aspectRatio: "16/9",
+            }}
+            whileHover={{
+              x: isReversed ? -7 : 7,
+              y: 7,
+              borderColor: "rgba(245,158,11,0.36)",
+            }}
+            transition={{ duration: 0.35 }}
+          />
+        </motion.div>
       </div>
 
       {/* ── info column ── */}
@@ -291,8 +362,7 @@ function ProjectCard({
           className="ember-glass p-6 rounded-xl mb-6 shadow-xl"
           whileHover={{
             borderColor: "rgba(245,158,11,0.35)",
-            boxShadow:
-              "0 0 24px rgba(245,158,11,0.08), 0 12px 40px rgba(0,0,0,0.5)",
+            boxShadow: "0 0 24px rgba(245,158,11,0.08), 0 12px 40px rgba(0,0,0,0.5)",
           }}
           transition={{ duration: 0.25 }}
         >
