@@ -33,35 +33,42 @@ export function BackgroundMusic() {
     };
   }, []);
 
+  const playAudio = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.muted = false;
+    try {
+      await audio.play();
+      setIsPlaying(true);
+    } catch {
+      setIsPlaying(false);
+    }
+  };
+
   useEffect(() => {
     if (!armed) return;
-    const audio = audioRef.current;
-    if (!audio || !audio.paused) return;
-    void audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+    void playAudio();
   }, [armed]);
 
   const toggle = async () => {
     const audio = audioRef.current;
     if (!audio) return;
 
+    audio.muted = false;
     if (audio.paused) {
-      try {
-        await audio.play();
-        setIsPlaying(true);
-      } catch {
-        setIsPlaying(false);
-      }
+      await playAudio();
     } else {
       audio.pause();
       setIsPlaying(false);
     }
   };
 
-  const nextTrack = () => {
+  const restart = async () => {
     const audio = audioRef.current;
     if (!audio) return;
+    audio.muted = false;
     audio.currentTime = 0;
-    void audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+    await playAudio();
   };
 
   return (
@@ -108,7 +115,7 @@ export function BackgroundMusic() {
 
         <button
           type="button"
-          onClick={nextTrack}
+          onClick={restart}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-95"
           style={{ background: "rgba(245,158,11,0.08)", color: "#f59e0b" }}
           aria-label="Restart track"
