@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 const stats = [
   { value: "8+",   label: "Years Experience" },
@@ -13,6 +14,8 @@ const skills = [
 ];
 
 export function About() {
+  const [showReal, setShowReal] = useState(false);
+
   return (
     <section id="about" aria-labelledby="about-heading" className="py-32 bg-background relative z-10">
       <div className="container mx-auto px-6">
@@ -31,7 +34,8 @@ export function About() {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-          {/* ── Text column ─────────────────────────────────────── */}
+
+          {/* ── Text column ────────────────────────────────────── */}
           <div className="lg:col-span-7 space-y-6 text-lg text-muted-foreground leading-relaxed">
             <motion.dl
               initial={{ opacity: 0, y: 20 }}
@@ -58,6 +62,7 @@ export function About() {
               in software engineering started when I first discovered I could make computers do exactly
               what I wanted — and I&apos;ve been obsessed with building ever since.
             </motion.p>
+
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -96,13 +101,29 @@ export function About() {
 
           {/* ── Photo column ────────────────────────────────────── */}
           <motion.div
-            className="lg:col-span-5 relative group"
+            className="lg:col-span-5 relative"
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
-            <div className="relative w-full max-w-sm mx-auto">
+            {/* Toggle button */}
+            <div className="flex justify-end mb-3">
+              <button
+                onClick={() => setShowReal((p) => !p)}
+                className="font-mono text-xs text-muted-foreground hover:text-primary transition-colors border border-border hover:border-primary/50 px-3 py-1.5 rounded-sm flex items-center gap-2"
+                aria-label={showReal ? "Show illustrated avatar" : "Show real photo"}
+              >
+                <span
+                  className="inline-block w-1.5 h-1.5 rounded-full bg-primary"
+                  aria-hidden="true"
+                  style={{ boxShadow: "0 0 6px rgba(139,92,246,0.8)" }}
+                />
+                {showReal ? "illustrated" : "real photo"}
+              </button>
+            </div>
+
+            <div className="relative w-full max-w-sm mx-auto group">
               {/* Offset decorative border frame */}
               <div
                 className="absolute inset-0 border-2 border-primary translate-x-5 translate-y-5 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform duration-500 rounded-sm z-0"
@@ -111,46 +132,62 @@ export function About() {
 
               {/* Ambient glow */}
               <div
-                className="absolute -inset-4 bg-primary/10 blur-2xl rounded-full opacity-60 group-hover:opacity-90 transition-opacity duration-500 z-0"
+                className="absolute -inset-6 rounded-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 blur-2xl"
+                style={{ background: "radial-gradient(ellipse, rgba(139,92,246,0.25) 0%, transparent 70%)" }}
                 aria-hidden="true"
               />
 
               {/* Photo card */}
               <div className="relative z-10 overflow-hidden rounded-sm bg-card border border-card-border">
-                {/* Subtle color overlay on hover */}
-                <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 mix-blend-color" />
+                {/* Corner accent marks */}
+                <div className="absolute -top-px -left-px w-4 h-4 border-t-2 border-l-2 border-primary z-20" aria-hidden="true" />
+                <div className="absolute -top-px -right-px w-4 h-4 border-t-2 border-r-2 border-primary z-20" aria-hidden="true" />
+                <div className="absolute -bottom-px -left-px w-4 h-4 border-b-2 border-l-2 border-primary z-20" aria-hidden="true" />
+                <div className="absolute -bottom-px -right-px w-4 h-4 border-b-2 border-r-2 border-primary z-20" aria-hidden="true" />
 
-                <img
+                {/* Illustrated avatar */}
+                <motion.img
+                  key="illustrated"
+                  src="/avatar-illustrated.png"
+                  alt="Anh Duy — illustrated developer avatar"
+                  className="w-full h-auto object-cover block"
+                  animate={{ opacity: showReal ? 0 : 1 }}
+                  transition={{ duration: 0.45 }}
+                  style={{ position: showReal ? "absolute" : "relative", inset: 0 }}
+                  draggable={false}
+                />
+
+                {/* Real photo */}
+                <motion.img
+                  key="real"
                   src="/avatar.png"
-                  alt="Anh Duy — profile photo"
-                  className="w-full h-auto object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                  alt="Anh Duy — real photo"
+                  className="w-full h-auto object-cover object-top block"
+                  animate={{ opacity: showReal ? 1 : 0 }}
+                  transition={{ duration: 0.45 }}
                   style={{
-                    filter: "grayscale(1)",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.filter = "grayscale(0) drop-shadow(0 0 20px rgba(139,92,246,0.4))";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.filter = "grayscale(1)";
+                    position: showReal ? "relative" : "absolute",
+                    inset: 0,
+                    background: "linear-gradient(135deg,#0d0014 0%,#180030 50%,#0a001a 100%)",
+                    filter: showReal ? "drop-shadow(0 0 24px rgba(139,92,246,0.45))" : "none",
                   }}
                   draggable={false}
                 />
 
-                {/* Bottom gradient overlay */}
+                {/* Label badge */}
+                <div className="absolute top-3 left-3 z-20">
+                  <span className="font-mono text-[10px] tracking-widest uppercase px-2 py-1 bg-black/60 backdrop-blur-sm border border-primary/30 text-primary rounded-sm">
+                    {showReal ? "Real" : "Illustrated"}
+                  </span>
+                </div>
+
+                {/* Bottom gradient */}
                 <div
-                  className="absolute bottom-0 left-0 right-0 h-16 z-20"
-                  style={{
-                    background: "linear-gradient(to top, rgba(5,5,5,0.6) 0%, transparent 100%)",
-                  }}
+                  className="absolute bottom-0 left-0 right-0 h-12 z-20 pointer-events-none"
+                  style={{ background: "linear-gradient(to top, rgba(5,5,5,0.5) 0%, transparent 100%)" }}
                   aria-hidden="true"
                 />
               </div>
-
-              {/* Corner accent marks */}
-              <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-primary z-20" aria-hidden="true" />
-              <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-primary z-20" aria-hidden="true" />
-              <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-primary z-20" aria-hidden="true" />
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-primary z-20" aria-hidden="true" />
             </div>
           </motion.div>
         </div>

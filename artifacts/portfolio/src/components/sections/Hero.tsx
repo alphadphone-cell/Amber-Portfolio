@@ -26,25 +26,21 @@ function MagneticCTA({
     const el = ref.current;
     const inner = innerRef.current;
     if (!el || !inner) return;
-
     const strength = 0.35;
     const innerStrength = 0.55;
-
     const onMove = (e: MouseEvent) => {
       const rect = el.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
       const dx = e.clientX - cx;
       const dy = e.clientY - cy;
-      gsap.to(el, { x: dx * strength, y: dy * strength, duration: 0.4, ease: "power2.out" });
+      gsap.to(el,    { x: dx * strength,      y: dy * strength,      duration: 0.4, ease: "power2.out" });
       gsap.to(inner, { x: dx * innerStrength, y: dy * innerStrength, duration: 0.4, ease: "power2.out" });
     };
-
     const onLeave = () => {
-      gsap.to(el, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.4)" });
+      gsap.to(el,    { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.4)" });
       gsap.to(inner, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.4)" });
     };
-
     const area = el.parentElement!;
     area.addEventListener("mousemove", onMove);
     area.addEventListener("mouseleave", onLeave);
@@ -74,28 +70,19 @@ export function Hero() {
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   useEffect(() => {
-    if (prefersReduced) {
-      setDisplayText(TITLES[0]);
-      return;
-    }
+    if (prefersReduced) { setDisplayText(TITLES[0]); return; }
     let timeout: ReturnType<typeof setTimeout>;
     const current = TITLES[titleIndex];
     if (isDeleting) {
       if (displayText.length > 0) {
-        timeout = setTimeout(
-          () => setDisplayText(current.slice(0, displayText.length - 1)),
-          36
-        );
+        timeout = setTimeout(() => setDisplayText(current.slice(0, displayText.length - 1)), 36);
       } else {
         setIsDeleting(false);
         setTitleIndex((p) => (p + 1) % TITLES.length);
       }
     } else {
       if (displayText.length < current.length) {
-        timeout = setTimeout(
-          () => setDisplayText(current.slice(0, displayText.length + 1)),
-          65
-        );
+        timeout = setTimeout(() => setDisplayText(current.slice(0, displayText.length + 1)), 65);
       } else {
         timeout = setTimeout(() => setIsDeleting(true), 2400);
       }
@@ -103,17 +90,18 @@ export function Hero() {
     return () => clearTimeout(timeout);
   }, [displayText, isDeleting, titleIndex, prefersReduced]);
 
+  /* Mouse-parallax springs */
   const mx = useMotionValue(0.5);
   const my = useMotionValue(0.5);
-  const imgX = useSpring(useTransform(mx, [0, 1], [-12, 12]), { damping: 30, stiffness: 80 });
-  const imgY = useSpring(useTransform(my, [0, 1], [-8, 8]), { damping: 30, stiffness: 80 });
-  const imgRX = useSpring(useTransform(my, [0, 1], [4, -4]), { damping: 30, stiffness: 80 });
-  const imgRY = useSpring(useTransform(mx, [0, 1], [-6, 6]), { damping: 30, stiffness: 80 });
+  const imgX  = useSpring(useTransform(mx, [0,1], [-14, 14]), { damping: 30, stiffness: 70 });
+  const imgY  = useSpring(useTransform(my, [0,1], [-10, 10]), { damping: 30, stiffness: 70 });
+  const imgRX = useSpring(useTransform(my, [0,1], [4, -4]),   { damping: 30, stiffness: 70 });
+  const imgRY = useSpring(useTransform(mx, [0,1], [-6,  6]),  { damping: 30, stiffness: 70 });
 
   const handleMove = (e: React.MouseEvent<HTMLElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
     mx.set((e.clientX - r.left) / r.width);
-    my.set((e.clientY - r.top) / r.height);
+    my.set((e.clientY - r.top)  / r.height);
   };
 
   return (
@@ -122,56 +110,58 @@ export function Hero() {
       className="relative min-h-[100dvh] flex items-center overflow-hidden"
       onMouseMove={handleMove}
     >
-      {/* subtle radial overlay */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_50%_at_60%_-5%,rgba(139,92,246,0.18),transparent)]" />
-      </div>
-
-      {/* ── Profile avatar (right side, desktop) ─────────────── */}
+      {/* ── Illustrated avatar — right half (desktop) ───────── */}
       <motion.div
-        className="absolute right-[-2%] top-1/2 -translate-y-1/2 w-[500px] h-[560px] pointer-events-none z-0 hidden lg:block"
-        style={{ x: imgX, y: imgY, rotateX: imgRX, rotateY: imgRY, perspective: 900 }}
+        className="absolute right-0 top-0 bottom-0 w-[55%] pointer-events-none z-0 hidden lg:block"
+        style={{ x: imgX, y: imgY, rotateX: imgRX, rotateY: imgRY, perspective: 1000 }}
+        initial={{ opacity: 0, x: 60 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
       >
-        {/* left-to-body gradient mask so image blends into background */}
+        {/* Left-edge gradient — blends art into the text column */}
         <div
-          className="absolute inset-0 z-20"
+          className="absolute inset-0 z-10"
           style={{
-            background:
-              "linear-gradient(to right, #050505 0%, #050505 8%, transparent 38%, transparent 100%)",
+            background: "linear-gradient(to right, #050505 0%, #050505 5%, rgba(5,5,5,0.7) 28%, rgba(5,5,5,0.15) 55%, transparent 100%)",
           }}
         />
-        {/* bottom fade */}
+        {/* Bottom fade */}
         <div
-          className="absolute inset-0 z-20"
-          style={{
-            background:
-              "linear-gradient(to top, #050505 0%, transparent 30%)",
-          }}
+          className="absolute inset-0 z-10"
+          style={{ background: "linear-gradient(to top, #050505 0%, transparent 22%)" }}
+        />
+        {/* Top fade */}
+        <div
+          className="absolute inset-0 z-10"
+          style={{ background: "linear-gradient(to bottom, #050505 0%, transparent 16%)" }}
         />
 
-        {/* Decorative rings behind the photo */}
-        <div
-          className="absolute inset-[5%] rounded-full border border-primary/20 z-0"
-          style={{ animation: prefersReduced ? "none" : "spin 18s linear infinite" }}
-        />
-        <div
-          className="absolute inset-[18%] rounded-full border border-primary/10 z-0"
-          style={{ animation: prefersReduced ? "none" : "spin 28s linear infinite reverse" }}
-        />
-
-        {/* Glow halo */}
-        <div className="absolute inset-[22%] rounded-full bg-primary/10 blur-3xl z-0" />
-        <div className="absolute inset-[35%] rounded-full bg-violet-500/20 blur-2xl z-0" />
-
-        {/* Photo */}
+        {/* The illustrated avatar — fills the right panel */}
         <img
-          src="/avatar.png"
-          alt="Anh Duy — profile photo"
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[88%] h-auto object-contain object-bottom z-10"
-          style={{
-            filter: "drop-shadow(0 0 40px rgba(139,92,246,0.45)) drop-shadow(0 0 80px rgba(139,92,246,0.2))",
-          }}
+          src="/avatar-illustrated.png"
+          alt="Anh Duy — illustrated developer avatar"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{ mixBlendMode: "luminosity", opacity: 0.92 }}
           draggable={false}
+        />
+        {/* Same image with color overlay so it keeps purple tones */}
+        <img
+          src="/avatar-illustrated.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{ opacity: 0.55 }}
+          draggable={false}
+        />
+
+        {/* Subtle ambient glow dot */}
+        <div
+          className="absolute bottom-[15%] right-[20%] w-48 h-48 rounded-full z-0"
+          style={{
+            background: "radial-gradient(circle, rgba(139,92,246,0.3) 0%, transparent 70%)",
+            filter: "blur(30px)",
+          }}
+          aria-hidden="true"
         />
       </motion.div>
 
@@ -181,7 +171,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-3xl"
+          className="max-w-[52%] lg:max-w-xl"
         >
           <motion.p
             className="font-mono text-[11px] tracking-[0.4em] text-primary uppercase mb-6"
@@ -197,7 +187,7 @@ export function Hero() {
             style={{
               fontFamily: "var(--app-font-display)",
               fontWeight: 800,
-              fontSize: "clamp(3.5rem, 11vw, 7.5rem)",
+              fontSize: "clamp(3.5rem, 10vw, 7.5rem)",
               letterSpacing: "-0.04em",
             }}
           >
@@ -209,7 +199,7 @@ export function Hero() {
             style={{
               fontFamily: "var(--app-font-display)",
               fontWeight: 700,
-              fontSize: "clamp(1.75rem, 5.5vw, 4rem)",
+              fontSize: "clamp(1.5rem, 4.5vw, 3.5rem)",
               letterSpacing: "-0.025em",
             }}
           >
@@ -221,31 +211,27 @@ export function Hero() {
             />
           </h2>
 
-          <p className="text-base md:text-lg text-muted-foreground max-w-xl mb-14 leading-[1.75]">
+          <p className="text-base md:text-lg text-muted-foreground max-w-md mb-14 leading-[1.75]">
             I build exceptional digital experiences — fast, accessible, and visually
             compelling. Currently focused on distributed systems and developer tooling.
           </p>
 
-          {/* Mobile avatar — shown below text on small screens */}
+          {/* Mobile avatar */}
           <motion.div
-            className="lg:hidden flex justify-center mb-12"
+            className="lg:hidden flex justify-center mb-10"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.4 }}
           >
             <div className="relative w-48 h-48">
-              {/* ring border */}
               <div className="absolute inset-0 rounded-full border-2 border-primary/40" />
               <div className="absolute -inset-1 rounded-full border border-primary/15" />
-              {/* glow */}
               <div className="absolute inset-0 rounded-full bg-primary/10 blur-xl" />
               <img
-                src="/avatar.png"
+                src="/avatar-illustrated.png"
                 alt="Anh Duy"
                 className="relative w-full h-full object-cover object-top rounded-full z-10"
-                style={{
-                  filter: "drop-shadow(0 0 20px rgba(139,92,246,0.5))",
-                }}
+                style={{ filter: "drop-shadow(0 0 20px rgba(139,92,246,0.5))" }}
                 draggable={false}
               />
             </div>
@@ -257,7 +243,7 @@ export function Hero() {
               className="inline-flex items-center gap-3 bg-primary text-primary-foreground px-8 py-4 font-semibold text-sm tracking-wide rounded-xl hover:bg-primary/90 transition-colors"
             >
               View My Work
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="w-4 h-4" />
             </MagneticCTA>
 
             <MagneticCTA
@@ -278,9 +264,7 @@ export function Hero() {
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         aria-hidden="true"
       >
-        <span className="font-mono text-[10px] text-muted-foreground tracking-[0.4em] uppercase">
-          Scroll
-        </span>
+        <span className="font-mono text-[10px] text-muted-foreground tracking-[0.4em] uppercase">Scroll</span>
         <motion.div
           animate={prefersReduced ? {} : { y: [0, 6, 0] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}

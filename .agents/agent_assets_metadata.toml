@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "DR6oPIwD8mcphfS2G-u6z"
+uri = "file://artifacts/portfolio/public/avatar-illustrated.png"
+type = "image"
+title = "void purple developer avatar"
