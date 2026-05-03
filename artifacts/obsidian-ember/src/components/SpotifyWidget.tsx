@@ -39,7 +39,6 @@ function EqBars() {
   );
 }
 
-/* ── types ───────────────────────────────────────────── */
 type NowPlayingData = {
   isPlaying: boolean;
   track?: {
@@ -50,14 +49,12 @@ type NowPlayingData = {
   };
 };
 
-/* ── fetch helper ────────────────────────────────────── */
 async function fetchNowPlaying(): Promise<NowPlayingData> {
   const res = await fetch("/api/spotify/now-playing");
   if (!res.ok) throw new Error("fetch failed");
   return res.json() as Promise<NowPlayingData>;
 }
 
-/* ── widget ──────────────────────────────────────────── */
 export function SpotifyWidget() {
   const { data, isLoading } = useQuery({
     queryKey: ["spotify-now-playing"],
@@ -95,49 +92,26 @@ export function SpotifyWidget() {
             boxShadow: "0 0 20px rgba(245,158,11,0.10)",
           }}
         >
-          {/* Album art */}
           <img
             src={data!.track!.albumArt}
             alt={data!.track!.name}
             className="w-9 h-9 rounded-md object-cover shrink-0"
             style={{ boxShadow: "0 0 8px rgba(245,158,11,0.25)" }}
           />
-
-          {/* Equalizer bars */}
           <EqBars />
-
-          {/* Track info */}
           <div className="flex flex-col min-w-0">
-            <span
-              className="text-[11px] font-semibold truncate max-w-[130px] leading-tight"
-              style={{ color: "#fef3c7" }}
-            >
+            <span className="text-[11px] font-semibold truncate max-w-[130px] leading-tight" style={{ color: "#fef3c7" }}>
               {data!.track!.name}
             </span>
-            <span
-              className="text-[10px] truncate max-w-[130px] leading-tight mt-0.5"
-              style={{ color: "rgba(245,158,11,0.55)" }}
-            >
+            <span className="text-[10px] truncate max-w-[130px] leading-tight mt-0.5" style={{ color: "rgba(245,158,11,0.55)" }}>
               {data!.track!.artist}
             </span>
           </div>
         </motion.a>
       ) : (
-        <motion.div
-          key="idle"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="flex items-center gap-2"
-        >
-          <SpotifyIcon
-            className="w-3.5 h-3.5 shrink-0"
-            style={{ color: "rgba(245,158,11,0.30)" } as React.CSSProperties}
-          />
-          <span
-            className="font-mono text-[10px]"
-            style={{ color: "rgba(245,158,11,0.30)" }}
-          >
+        <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
+          <SpotifyIcon className="w-3.5 h-3.5 shrink-0" />
+          <span className="font-mono text-[10px]" style={{ color: "rgba(245,158,11,0.30)" }}>
             Not playing
           </span>
         </motion.div>

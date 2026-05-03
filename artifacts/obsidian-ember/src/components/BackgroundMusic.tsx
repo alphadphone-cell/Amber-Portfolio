@@ -10,6 +10,35 @@ const TRACKS = [
   },
 ];
 
+function VolumeEqualizer({ active }: { active: boolean }) {
+  const bars = [
+    { h: "40%", d: 0.0 },
+    { h: "85%", d: 0.12 },
+    { h: "55%", d: 0.24 },
+    { h: "95%", d: 0.1 },
+    { h: "65%", d: 0.18 },
+  ];
+
+  return (
+    <div className="flex items-end gap-1 h-5 w-12" aria-hidden="true">
+      {bars.map((bar, i) => (
+        <motion.span
+          key={i}
+          className="w-1 rounded-full origin-bottom"
+          style={{ background: "linear-gradient(180deg, #fef3c7 0%, #f59e0b 55%, #dc2626 100%)" }}
+          animate={active ? { height: [bar.h, "100%", "30%", "85%", bar.h] } : { height: "25%" }}
+          transition={{
+            duration: 0.9,
+            repeat: active ? Infinity : 0,
+            ease: "easeInOut",
+            delay: bar.d,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function BackgroundMusic() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -102,6 +131,8 @@ export function BackgroundMusic() {
             {track.artist}
           </p>
         </div>
+
+        <VolumeEqualizer active={isPlaying} />
 
         <button
           type="button"
