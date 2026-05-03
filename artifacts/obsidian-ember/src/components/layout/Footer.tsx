@@ -13,17 +13,35 @@ export function Footer() {
         <div className="flex flex-col items-start gap-2">
           <a
             href="#hero"
-            className="text-2xl font-black tracking-tighter"
-            style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              background: "linear-gradient(135deg, #fef3c7 0%, #f59e0b 60%, #dc2626 100%)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              color: "transparent",
-            }}
+            className="flex items-center gap-1 group"
+            aria-label="AlphaD — back to top"
           >
-            A.CHEN
+            <span
+              className="text-2xl font-black"
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                background: "linear-gradient(135deg, #fef3c7 0%, #f59e0b 55%, #dc2626 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+              }}
+            >
+              α
+            </span>
+            <span
+              className="text-xl font-bold"
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                background: "linear-gradient(135deg, #fde68a 0%, #f59e0b 70%, #b45309 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+              }}
+            >
+              D
+            </span>
           </a>
+          <p className="text-xs font-mono mt-0.5" style={{ color: "rgba(245,158,11,0.5)" }}>Anh Duy · AlphaD</p>
           <p className="text-sm text-muted-foreground">Forging scalable systems and beautiful interfaces.</p>
         </div>
 
@@ -53,7 +71,7 @@ export function Footer() {
               ))}
             </ul>
           )}
-          <p className="font-mono text-xs text-muted-foreground">Designed & Built by Alex Chen</p>
+          <p className="font-mono text-xs text-muted-foreground">Designed & Built by <span style={{ color: "#f59e0b" }}>Anh Duy</span></p>
         </div>
 
       </div>

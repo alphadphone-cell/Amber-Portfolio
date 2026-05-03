@@ -95,7 +95,7 @@ export function Preloader({ onComplete }: PreloaderProps) {
             transition={{ delay: 0.5 }}
             aria-hidden="true"
           >
-            A.CHEN / PORTFOLIO
+            ANHDUY · AlphaD
           </motion.div>
         </motion.div>
       )}

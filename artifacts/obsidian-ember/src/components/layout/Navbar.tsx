@@ -74,19 +74,38 @@ export function Navbar() {
         <div className="container mx-auto px-6 flex items-center justify-between">
           <a
             href="#hero"
-            className="text-2xl tracking-tighter transition-opacity duration-200 hover:opacity-80 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4 rounded-sm"
-            style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800 }}
-            aria-label="A.CHEN — back to top"
+            className="flex items-center gap-1.5 tracking-tight transition-all duration-200 hover:opacity-85 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4 rounded-sm group"
+            aria-label="AlphaD — back to top"
           >
             <span
+              className="text-2xl font-black"
               style={{
-                background: "linear-gradient(135deg, #fef3c7 0%, #fde68a 25%, #f59e0b 60%, #dc2626 100%)",
+                fontFamily: "'Space Grotesk', sans-serif",
+                background: "linear-gradient(135deg, #fef3c7 0%, #f59e0b 55%, #dc2626 100%)",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 color: "transparent",
               }}
             >
-              A.CHEN
+              α
+            </span>
+            <span
+              className="text-xl font-bold"
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                background: "linear-gradient(135deg, #fde68a 0%, #f59e0b 70%, #b45309 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+              }}
+            >
+              D
+            </span>
+            <span
+              className="text-[10px] font-mono tracking-[0.2em] uppercase self-end mb-0.5 opacity-50 group-hover:opacity-70 transition-opacity"
+              style={{ color: "#f59e0b" }}
+            >
+              ·AlphaD
             </span>
           </a>
 
