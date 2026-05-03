@@ -31,6 +31,7 @@ export function About() {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+          {/* ── Text column ─────────────────────────────────────── */}
           <div className="lg:col-span-7 space-y-6 text-lg text-muted-foreground leading-relaxed">
             <motion.dl
               initial={{ opacity: 0, y: 20 }}
@@ -55,7 +56,7 @@ export function About() {
             >
               Hello! My name is Anh Duy and I enjoy creating things that live on the internet. My interest
               in software engineering started when I first discovered I could make computers do exactly
-              what I wanted — and I've been obsessed with building ever since.
+              what I wanted — and I&apos;ve been obsessed with building ever since.
             </motion.p>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -63,7 +64,7 @@ export function About() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              Fast-forward to today, and I've had the privilege of working at an advertising agency,
+              Fast-forward to today, and I&apos;ve had the privilege of working at an advertising agency,
               a start-up, a huge corporation, and a student-led design studio. My main focus these
               days is building accessible, inclusive products and digital experiences.
             </motion.p>
@@ -75,7 +76,7 @@ export function About() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="pt-8"
             >
-              <p className="mb-4">Here are a few technologies I've been working with recently:</p>
+              <p className="mb-4">Here are a few technologies I&apos;ve been working with recently:</p>
               <ul className="flex flex-wrap gap-3" aria-label="Technologies">
                 {skills.map((skill, index) => (
                   <motion.li
@@ -93,30 +94,63 @@ export function About() {
             </motion.div>
           </div>
 
+          {/* ── Photo column ────────────────────────────────────── */}
           <motion.div
             className="lg:col-span-5 relative group"
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
           >
-            <div
-              className="relative w-full max-w-md mx-auto aspect-square z-10"
-              role="img"
-              aria-label="Stylised initials AD representing Anh Duy"
-            >
-              <div className="absolute inset-0 bg-muted/30 grayscale filter transition-all duration-500 group-hover:grayscale-0 flex items-center justify-center rounded-sm">
-                <span
-                  className="text-8xl font-black text-muted-foreground/30 tracking-tighter group-hover:text-primary/30 transition-colors"
-                  aria-hidden="true"
-                >
-                  AD
-                </span>
-              </div>
+            <div className="relative w-full max-w-sm mx-auto">
+              {/* Offset decorative border frame */}
               <div
-                className="absolute inset-0 border-2 border-primary translate-x-4 translate-y-4 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500 -z-10 rounded-sm"
+                className="absolute inset-0 border-2 border-primary translate-x-5 translate-y-5 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform duration-500 rounded-sm z-0"
                 aria-hidden="true"
               />
+
+              {/* Ambient glow */}
+              <div
+                className="absolute -inset-4 bg-primary/10 blur-2xl rounded-full opacity-60 group-hover:opacity-90 transition-opacity duration-500 z-0"
+                aria-hidden="true"
+              />
+
+              {/* Photo card */}
+              <div className="relative z-10 overflow-hidden rounded-sm bg-card border border-card-border">
+                {/* Subtle color overlay on hover */}
+                <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 mix-blend-color" />
+
+                <img
+                  src="/avatar.png"
+                  alt="Anh Duy — profile photo"
+                  className="w-full h-auto object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                  style={{
+                    filter: "grayscale(1)",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.filter = "grayscale(0) drop-shadow(0 0 20px rgba(139,92,246,0.4))";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.filter = "grayscale(1)";
+                  }}
+                  draggable={false}
+                />
+
+                {/* Bottom gradient overlay */}
+                <div
+                  className="absolute bottom-0 left-0 right-0 h-16 z-20"
+                  style={{
+                    background: "linear-gradient(to top, rgba(5,5,5,0.6) 0%, transparent 100%)",
+                  }}
+                  aria-hidden="true"
+                />
+              </div>
+
+              {/* Corner accent marks */}
+              <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-primary z-20" aria-hidden="true" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-primary z-20" aria-hidden="true" />
+              <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-primary z-20" aria-hidden="true" />
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-primary z-20" aria-hidden="true" />
             </div>
           </motion.div>
         </div>

@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Github, Linkedin, Twitter } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import gsap from "gsap";
 
 const TITLES = [
@@ -69,7 +69,8 @@ export function Hero() {
   const [titleIndex, setTitleIndex] = useState(0);
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
-  const prefersReduced = typeof window !== "undefined" &&
+  const prefersReduced =
+    typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   useEffect(() => {
@@ -81,14 +82,20 @@ export function Hero() {
     const current = TITLES[titleIndex];
     if (isDeleting) {
       if (displayText.length > 0) {
-        timeout = setTimeout(() => setDisplayText(current.slice(0, displayText.length - 1)), 36);
+        timeout = setTimeout(
+          () => setDisplayText(current.slice(0, displayText.length - 1)),
+          36
+        );
       } else {
         setIsDeleting(false);
         setTitleIndex((p) => (p + 1) % TITLES.length);
       }
     } else {
       if (displayText.length < current.length) {
-        timeout = setTimeout(() => setDisplayText(current.slice(0, displayText.length + 1)), 65);
+        timeout = setTimeout(
+          () => setDisplayText(current.slice(0, displayText.length + 1)),
+          65
+        );
       } else {
         timeout = setTimeout(() => setIsDeleting(true), 2400);
       }
@@ -98,10 +105,10 @@ export function Hero() {
 
   const mx = useMotionValue(0.5);
   const my = useMotionValue(0.5);
-  const orbX = useSpring(useTransform(mx, [0, 1], [-20, 20]), { damping: 30, stiffness: 80 });
-  const orbY = useSpring(useTransform(my, [0, 1], [-14, 14]), { damping: 30, stiffness: 80 });
-  const orbRX = useSpring(useTransform(my, [0, 1], [5, -5]), { damping: 30, stiffness: 80 });
-  const orbRY = useSpring(useTransform(mx, [0, 1], [-7, 7]), { damping: 30, stiffness: 80 });
+  const imgX = useSpring(useTransform(mx, [0, 1], [-12, 12]), { damping: 30, stiffness: 80 });
+  const imgY = useSpring(useTransform(my, [0, 1], [-8, 8]), { damping: 30, stiffness: 80 });
+  const imgRX = useSpring(useTransform(my, [0, 1], [4, -4]), { damping: 30, stiffness: 80 });
+  const imgRY = useSpring(useTransform(mx, [0, 1], [-6, 6]), { damping: 30, stiffness: 80 });
 
   const handleMove = (e: React.MouseEvent<HTMLElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
@@ -115,49 +122,60 @@ export function Hero() {
       className="relative min-h-[100dvh] flex items-center overflow-hidden"
       onMouseMove={handleMove}
     >
+      {/* subtle radial overlay */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_50%_at_60%_-5%,rgba(139,92,246,0.18),transparent)]" />
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: "radial-gradient(circle,rgba(139,92,246,1) 1px,transparent 1px)",
-            backgroundSize: "32px 32px",
-          }}
-        />
       </div>
 
+      {/* ── Profile avatar (right side, desktop) ─────────────── */}
       <motion.div
-        className="absolute right-[-4%] top-1/2 -translate-y-1/2 w-[580px] h-[580px] pointer-events-none z-0 hidden lg:block"
-        style={{ x: orbX, y: orbY, rotateX: orbRX, rotateY: orbRY, perspective: 900 }}
+        className="absolute right-[-2%] top-1/2 -translate-y-1/2 w-[500px] h-[560px] pointer-events-none z-0 hidden lg:block"
+        style={{ x: imgX, y: imgY, rotateX: imgRX, rotateY: imgRY, perspective: 900 }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/50 to-transparent z-10" />
-        <motion.div
-          className="w-full h-full relative"
-          animate={prefersReduced ? {} : { rotateZ: [0, 360] }}
-          transition={{ duration: 90, repeat: Infinity, ease: "linear" }}
-          style={{ transformStyle: "preserve-3d" }}
-        >
-          {[0, 45, 90, 135].map((a, i) => (
-            <div key={i} className="absolute inset-0 rounded-full border border-primary/15"
-              style={{ transform: `rotateX(${a}deg) rotateY(${a * 0.7}deg)` }} />
-          ))}
-          {[22, 67, 112, 157].map((a, i) => (
-            <div key={i} className="absolute inset-[15%] rounded-full border border-primary/10"
-              style={{ transform: `rotateX(${a}deg) rotateY(${a * 0.5}deg)` }} />
-          ))}
-          <div className="absolute inset-[32%] rounded-full bg-primary/5 blur-3xl" />
-          <div className="absolute inset-[40%] rounded-full bg-primary/12 blur-xl" />
-          <div
-            className="absolute inset-0 rounded-full opacity-20"
-            style={{
-              backgroundImage: "radial-gradient(circle,rgba(139,92,246,0.7) 1px,transparent 1px)",
-              backgroundSize: "28px 28px",
-              maskImage: "radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%)",
-            }}
-          />
-        </motion.div>
+        {/* left-to-body gradient mask so image blends into background */}
+        <div
+          className="absolute inset-0 z-20"
+          style={{
+            background:
+              "linear-gradient(to right, #050505 0%, #050505 8%, transparent 38%, transparent 100%)",
+          }}
+        />
+        {/* bottom fade */}
+        <div
+          className="absolute inset-0 z-20"
+          style={{
+            background:
+              "linear-gradient(to top, #050505 0%, transparent 30%)",
+          }}
+        />
+
+        {/* Decorative rings behind the photo */}
+        <div
+          className="absolute inset-[5%] rounded-full border border-primary/20 z-0"
+          style={{ animation: prefersReduced ? "none" : "spin 18s linear infinite" }}
+        />
+        <div
+          className="absolute inset-[18%] rounded-full border border-primary/10 z-0"
+          style={{ animation: prefersReduced ? "none" : "spin 28s linear infinite reverse" }}
+        />
+
+        {/* Glow halo */}
+        <div className="absolute inset-[22%] rounded-full bg-primary/10 blur-3xl z-0" />
+        <div className="absolute inset-[35%] rounded-full bg-violet-500/20 blur-2xl z-0" />
+
+        {/* Photo */}
+        <img
+          src="/avatar.png"
+          alt="Anh Duy — profile photo"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[88%] h-auto object-contain object-bottom z-10"
+          style={{
+            filter: "drop-shadow(0 0 40px rgba(139,92,246,0.45)) drop-shadow(0 0 80px rgba(139,92,246,0.2))",
+          }}
+          draggable={false}
+        />
       </motion.div>
 
+      {/* ── Text content ──────────────────────────────────────── */}
       <div className="container relative z-10 mx-auto px-6 flex flex-col items-start pt-28 pb-20">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -208,6 +226,31 @@ export function Hero() {
             compelling. Currently focused on distributed systems and developer tooling.
           </p>
 
+          {/* Mobile avatar — shown below text on small screens */}
+          <motion.div
+            className="lg:hidden flex justify-center mb-12"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.4 }}
+          >
+            <div className="relative w-48 h-48">
+              {/* ring border */}
+              <div className="absolute inset-0 rounded-full border-2 border-primary/40" />
+              <div className="absolute -inset-1 rounded-full border border-primary/15" />
+              {/* glow */}
+              <div className="absolute inset-0 rounded-full bg-primary/10 blur-xl" />
+              <img
+                src="/avatar.png"
+                alt="Anh Duy"
+                className="relative w-full h-full object-cover object-top rounded-full z-10"
+                style={{
+                  filter: "drop-shadow(0 0 20px rgba(139,92,246,0.5))",
+                }}
+                draggable={false}
+              />
+            </div>
+          </motion.div>
+
           <div className="flex flex-wrap gap-4 items-center">
             <MagneticCTA
               href="#projects"
@@ -227,6 +270,7 @@ export function Hero() {
         </motion.div>
       </div>
 
+      {/* Scroll hint */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
