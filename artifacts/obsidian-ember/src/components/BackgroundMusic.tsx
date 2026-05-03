@@ -63,6 +63,7 @@ export function BackgroundMusic() {
     const start = () => setArmed(true);
     window.addEventListener("pointerdown", start, { once: true, passive: true });
     window.addEventListener("keydown", start, { once: true });
+    void playAudio();
     return () => {
       window.removeEventListener("pointerdown", start);
       window.removeEventListener("keydown", start);
@@ -207,7 +208,6 @@ export function BackgroundMusic() {
         preload="metadata"
         loop
         muted={!armed}
-        volume={volume}
         onTimeUpdate={(e) => {
           const audio = e.currentTarget;
           setProgress(audio.currentTime);
